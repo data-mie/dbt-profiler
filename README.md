@@ -77,5 +77,5 @@ models:
 This what the profile looks like on the dbt docs site:
 
 <p align="center">
- <img src=".github/dbt_docs_example.png" alt="dbt docs example" width=600/>
+ <img src=".github/dbt_docs_example.png" alt="dbt docs example"/>
 </p>
