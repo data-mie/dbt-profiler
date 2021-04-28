@@ -16,15 +16,28 @@ set relation = adapter.get_relation(
   {% set column_dicts = [] %}
   {% for column_name in column_names %}
     {% set profile_sql %}
-      select 
-        sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end)::numeric / count(*) as not_null_proportion,
-        count(distinct {{ adapter.quote(column_name) }})::numeric / count(*) as distinct_proportion,
-        count(distinct {{ adapter.quote(column_name) }}) as distinct_count,
-        count(distinct {{ adapter.quote(column_name) }}) = count(*) as is_unique,
-        null as data_type,
-        current_timestamp::varchar(255) as profiled_at
-      from {{ relation }}
+
+      with profile as (
+        select 
+          sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end)::numeric / count(*) as not_null_proportion,
+          count(distinct {{ adapter.quote(column_name) }})::numeric / count(*) as distinct_proportion,
+          count(distinct {{ adapter.quote(column_name) }}) as distinct_count,
+          count(distinct {{ adapter.quote(column_name) }}) = count(*) as is_unique,
+          current_timestamp::varchar(255) as profiled_at
+        from {{ relation }}
+      )
+      select
+        columns.data_type,
+        profile.*
+      from profile
+      left join {{ relation.information_schema() }}.columns as columns on (
+        columns.table_schema = '{{ target.schema }}' and
+        columns.table_name = '{{ relation_name }}' and
+        columns.column_name = '{{ column_name }}'
+      )
+
     {% endset %}
+
     {% set results = run_query(profile_sql) %}
     
     {% set meta_dict = {} %}
