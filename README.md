@@ -18,3 +18,59 @@ Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 ```bash
 dbt run-operation profile_relation --args '{"relation_name": "customers"}'
 ```
+
+### Example output:
+
+```yaml
+version: 2
+models:
+- name: customers
+  description: ''
+  columns:
+  - name: customer_id
+    description: ''
+    meta:
+      not_null_proportion: 1.0
+      distinct_proportion: 1.0
+      distinct_count: 100.0
+      is_unique: true
+      data_type: null
+      profiled_at: '2021-04-28 11:27:02.803132+00'
+  - name: first_order
+    description: ''
+    meta:
+      not_null_proportion: 0.62
+      distinct_proportion: 0.46
+      distinct_count: 46.0
+      is_unique: false
+      data_type: null
+      profiled_at: '2021-04-28 11:27:02.803132+00'
+  - name: most_recent_order
+    description: ''
+    meta:
+      not_null_proportion: 0.62
+      distinct_proportion: 0.52
+      distinct_count: 52.0
+      is_unique: false
+      data_type: null
+      profiled_at: '2021-04-28 11:27:02.803132+00'
+  - name: number_of_orders
+    description: ''
+    meta:
+      not_null_proportion: 0.62
+      distinct_proportion: 0.04
+      distinct_count: 4.0
+      is_unique: false
+      data_type: null
+      profiled_at: '2021-04-28 11:27:02.803132+00'
+  - name: customer_lifetime_value
+    description: ''
+    meta:
+      not_null_proportion: 0.62
+      distinct_proportion: 0.35
+      distinct_count: 35.0
+      is_unique: false
+      data_type: null
+      profiled_at: '2021-04-28 11:27:02.803132+00'
+```
+
