@@ -74,3 +74,8 @@ models:
       profiled_at: '2021-04-28 11:36:59.431462+00'
 ```
 
+This what the profile looks like on the dbt docs site:
+
+<p align="center">
+ <img src=".github/dbt_docs_example.png" alt="dbt docs example" width=600/>
+</p>
