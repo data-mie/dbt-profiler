@@ -48,13 +48,12 @@ set relation = adapter.get_relation(
 
   {% for row in results.rows %}
     {% set meta_dict = {} %}
-    {% set column_name = row.get("column_name") %}
+    {% set row_dict = row.dict() %}
+    {% set column_name = row_dict.pop("column_name") %}
  
-    {% for key, value in row.items() %}
-      {%- if key != "column_name" %} 
-        {% set column = results.columns.get(key) %}
-        {% do meta_dict.update({key: column.data_type.jsonify(value) }) %}
-      {%- endif %}
+    {% for key, value in row_dict.items() %}
+      {% set column = results.columns.get(key) %}
+      {% do meta_dict.update({key: column.data_type.jsonify(value) }) %}
     {% endfor %}
 
     {% set column_dict = {"name": column_name, "description": column_description, "meta": meta_dict} %}
