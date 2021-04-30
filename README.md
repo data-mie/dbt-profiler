@@ -13,6 +13,9 @@ This macro prints a relation profile to `stdout`.
 
 ### Arguments
 * `relation_name` (required): Relation name
+* `max_rows` (optional): The maximum number of rows to display before truncating the data
+* `max_columns` (optional): The maximum number of columns to display before truncating the data
+* `max_column_width` (optional): Truncate all columns to at most this width
 
 ### Usage
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
