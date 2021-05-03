@@ -2,8 +2,12 @@
 
 **NOTE: This is a Work in Progress, please do not integrate any of the implemented macros with production workflows.**
 
+Macros that profile dbt relations and create model schema YAML definitions containing said profiles. The macros have been tested with `Snowflake` and `PostgreSQL`.
 
-Macros that profile dbt relations and create model schema YAML definitions containing said profiles.
+# Contents
+* [print_profile](#print_profile-source)
+* [print_profile_schema](#print_profile_schema-source)
+* [get_profile](#get_profile-source)
 
 # Macros
 
@@ -13,9 +17,11 @@ This macro prints a relation profile to `stdout`.
 
 ### Arguments
 * `relation_name` (required): Relation name
+* `schema` (optional): Relation schema name (default: target schema)
 * `max_rows` (optional): The maximum number of rows to display before truncating the data
 * `max_columns` (optional): The maximum number of columns to display before truncating the data
 * `max_column_width` (optional): Truncate all columns to at most this width
+* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: no limit)
 
 ### Usage
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
@@ -117,6 +123,7 @@ This macro returns a relation profile as an [agate.Table](https://agate.readthed
 
 ### Arguments
 * `relation_name` (required): Relation name
+* `schema` (optional): Relation schema name. If not specified, default target schema is used.
 
 ### Usage
 

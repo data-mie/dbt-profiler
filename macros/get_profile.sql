@@ -1,9 +1,13 @@
-{% macro get_profile(relation_name) %}
+{% macro get_profile(relation_name, schema=none) %}
+
+{% if schema is none %}
+  {% set schema = target.schema %}
+{% endif %}
 
 {%- 
 set relation = adapter.get_relation(
   database=target.database,
-  schema=target.schema,
+  schema=schema,
   identifier=relation_name
 ) 
 -%}
@@ -15,7 +19,7 @@ set relation = adapter.get_relation(
   with column_profiles as (
     {% for column_name in column_names %}
       select 
-        '{{ column_name }}' as column_name,
+        lower('{{ column_name }}') as column_name,
         sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end)::numeric / count(*) as not_null_proportion,
         count(distinct {{ adapter.quote(column_name) }})::numeric / count(*) as distinct_proportion,
         count(distinct {{ adapter.quote(column_name) }}) as distinct_count,
@@ -36,9 +40,9 @@ set relation = adapter.get_relation(
     column_profiles.profiled_at
   from column_profiles
   left join {{ relation.information_schema() }}.columns as columns on (
-    columns.table_schema = '{{ target.schema }}' and
-    columns.table_name = '{{ relation_name }}' and
-    columns.column_name = column_profiles.column_name
+    lower(columns.table_schema) = lower('{{ schema }}') and
+    lower(columns.table_name) = lower('{{ relation_name }}') and
+    lower(columns.column_name) = lower(column_profiles.column_name)
   )
 {% endset %}
 

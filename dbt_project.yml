@@ -1,4 +1,4 @@
-name: "profiler"
+name: "dbt_profiler"
 version: "1.0"
 
 require-dbt-version: ">=0.18.0"
