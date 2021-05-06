@@ -1,0 +1,12 @@
+integration_tests:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: dbt
+      pass: dbt
+      port: 5432
+      dbname: dbt
+      schema: integration_tests
+      threads: 1
