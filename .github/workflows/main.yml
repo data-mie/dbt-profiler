@@ -34,3 +34,6 @@ jobs:
           pip install dbt==0.19.1
           dbt deps
           dbt --version
+
+      - name: Run seeds
+        run: dbt seed
