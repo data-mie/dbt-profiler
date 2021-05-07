@@ -11,7 +11,7 @@ on:
 
 env:
   DBT_PROFILES_DIR: ./
-  POSTGRES_HOST: localhost
+  POSTGRES_HOST: postgres
 
 defaults:
   run:
@@ -29,6 +29,8 @@ jobs:
           POSTGRES_USER: dbt
           POSTGRES_PASSWORD: dbt
           POSTGRES_DB: dbt
+        ports:
+          - 5432:5432
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
