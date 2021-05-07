@@ -46,6 +46,7 @@ This macro prints a relation schema YAML to `stdout` containing all columns and 
 
 ### Arguments
 * `relation_name` (required): Relation name
+* `schema` (optional): Relation schema name (default: target schema)
 * `model_description` (optional): Model description included in the schema
 * `column_description` (optional): Column descriptions included in the schema
 

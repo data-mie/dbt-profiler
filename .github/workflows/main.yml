@@ -50,3 +50,11 @@ jobs:
 
       - name: Run seeds
         run: dbt seed
+
+      - name: Tests print_profile macro
+        run: |
+          dbt run-operation print_profile --args '{"relation_name": "raw_payments", "schema": "integration_tests_raw_data"}'
+
+      - name: Tests print_profile_schema macro
+        run: |
+          dbt run-operation print_profile_schema --args '{"relation_name": "raw_payments", "schema": "integration_tests_raw_data"}'
