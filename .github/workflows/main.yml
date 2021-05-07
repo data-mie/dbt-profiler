@@ -54,10 +54,10 @@ jobs:
       - name: Run tests - Postgres
         run: dbt test --target postgres
 
-      - name: Test print_profile macro
+      - name: Run print_profile macro
         run: |
           dbt run-operation print_profile --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'
 
-      - name: Test print_profile_schema macro
+      - name: Run print_profile_schema macro
         run: |
           dbt run-operation print_profile_schema --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'
