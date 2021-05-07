@@ -49,12 +49,12 @@ jobs:
           dbt --version
 
       - name: Run seeds
-        run: dbt seed
+        run: dbt seed --target postgres
 
-      - name: Tests print_profile macro
+      - name: Test print_profile macro
         run: |
-          dbt run-operation print_profile --args '{"relation_name": "raw_payments", "schema": "integration_tests_raw_data"}'
+          dbt run-operation print_profile --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'
 
-      - name: Tests print_profile_schema macro
+      - name: Test print_profile_schema macro
         run: |
-          dbt run-operation print_profile_schema --args '{"relation_name": "raw_payments", "schema": "integration_tests_raw_data"}'
+          dbt run-operation print_profile_schema --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'

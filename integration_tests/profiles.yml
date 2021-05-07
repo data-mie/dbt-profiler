@@ -1,12 +1,16 @@
+config:
+  send_anonymous_usage_stats: False
+  use_colors: True
+
 integration_tests:
-  target: dev
+  target: postgres
   outputs:
-    dev:
+    postgres:
       type: postgres
       host: '{{ env_var("POSTGRES_HOST") }}'
       user: dbt
       pass: dbt
       port: 5432
       dbname: dbt
-      schema: integration_tests
+      schema: dbt_profiler_integration_tests_postgres
       threads: 1
