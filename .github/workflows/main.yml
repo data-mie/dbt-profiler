@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  DBT_PROFILES_DIR: ./integration_tests
+  DBT_PROFILES_DIR: ./
   POSTGRES_HOST: postgres
 
 defaults:
