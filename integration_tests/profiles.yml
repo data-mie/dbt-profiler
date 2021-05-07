@@ -3,7 +3,7 @@ integration_tests:
   outputs:
     dev:
       type: postgres
-      host: postgres
+      host: '{{ env_var("POSTGRES_HOST") }}'
       user: dbt
       pass: dbt
       port: 5432

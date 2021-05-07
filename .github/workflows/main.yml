@@ -11,6 +11,7 @@ on:
 
 env:
   DBT_PROFILES_DIR: ./integration_tests
+  POSTGRES_HOST: postgres
 
 defaults:
   run:
