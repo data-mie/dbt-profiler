@@ -21,7 +21,7 @@ jobs:
   integration_tests:
     name: integration_tests
     runs-on: ubuntu-latest
-    container: python:3.8-alpine
+    container: python:3.8-buster
 
     services:
       postgres:
