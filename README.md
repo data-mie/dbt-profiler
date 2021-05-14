@@ -1,4 +1,4 @@
-# dbt-profiler (alpha)
+# dbt-profiler (beta)
 
 **NOTE: This is a Work in Progress, please do not integrate any of the implemented macros with production workflows.**
 
@@ -8,6 +8,18 @@ Macros that profile dbt relations and create model schema YAML definitions conta
 * [print_profile](#print_profile-source)
 * [print_profile_schema](#print_profile_schema-source)
 * [get_profile](#get_profile-source)
+
+# Installation
+
+New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
+1. Include this package in your `packages.yml` file:
+```yml
+packages:
+  - package: https://github.com/data-mie/dbt-profiler.git
+    revision: 0.1.0
+```
+2. Run `dbt deps` to install the package.
+
 
 # Macros
 
@@ -46,6 +58,7 @@ This macro prints a relation schema YAML to `stdout` containing all columns and 
 
 ### Arguments
 * `relation_name` (required): Relation name
+* `schema` (optional): Relation schema name (default: target schema)
 * `model_description` (optional): Model description included in the schema
 * `column_description` (optional): Column descriptions included in the schema
 
