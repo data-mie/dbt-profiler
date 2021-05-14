@@ -29,7 +29,7 @@ For the second point there are at least two options: `meta` properties and `doc`
 
 {% enddocs %}
 ```
-3. Include the profile in model description
+3. Include the profile in a model description using the `doc` macro
 ```yml
 version: 2
 
