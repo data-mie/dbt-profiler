@@ -5,13 +5,18 @@
 
 {% if execute %}
   {% for row in results.rows %}
-    {% set meta_dict = {} %}
-    {% set row_dict = row.dict() %}
-    {% set column_name = row_dict.pop("column_name") %}
 
+    {% set row_dict = row.dict() %}
+    {% if "column_name" in row_dict %}
+      {% set column_name = row_dict.pop("column_name") %}
+    {% else %}
+      {% set column_name = row_dict.pop("COLUMN_NAME") %}
+    {% endif %}
+
+    {% set meta_dict = {} %}
     {% for key, value in row_dict.items() %}
       {% set column = results.columns.get(key) %}
-      {% do meta_dict.update({key: column.data_type.jsonify(value) }) %}
+      {% do meta_dict.update({key: column.data_type.jsonify(value)}) %}
     {% endfor %}
 
     {% set column_dict = {"name": column_name, "description": column_description, "meta": meta_dict} %}
@@ -33,7 +38,5 @@
   {{ log(schema_yaml, info=True) }}
   {% do return(schema_yaml) %}
 {% endif %}
-
-
 
 {% endmacro %}
