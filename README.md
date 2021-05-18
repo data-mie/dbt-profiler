@@ -73,11 +73,11 @@ This macro prints a relation profile as a Markdown table to `stdout`.
 
 ### Arguments
 * `relation_name` (required): Relation name
-* `schema` (optional): Relation schema name (default: target schema)
-* `max_rows` (optional): The maximum number of rows to display before truncating the data
-* `max_columns` (optional): The maximum number of columns to display before truncating the data
-* `max_column_width` (optional): Truncate all columns to at most this width
-* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: no limit)
+* `schema` (optional): Relation schema name (default: `none` i.e., target schema)
+* `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
+* `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
+* `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
+* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: `none` i.e., not limited)
 
 ### Usage
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
