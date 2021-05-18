@@ -8,15 +8,15 @@ Macros that profile dbt relation columns and create Markdown tables and model `s
 
 `dbt-profiler` aims to provide the following:
 
-1. `print_profile` macro for ad-hoc model profiling to support data exploration 
+1. [print_profile](#print_profile-source) macro for ad-hoc model profiling to support data exploration 
 2. Describe a mechanism to include model profiles in [dbt docs](https://docs.getdbt.com/docs/building-a-dbt-project/documentation)
 
 For the second point there are at least two options: `meta` properties and `doc` blocks. An example of the former is implemented in the [print_profile_schema](#print_profile_schema-source) macro. The latter can be achieved with the following pattern:
 
-1. Use [print_profile](#print_profile-source) macro to generate the profile as a Markdown table
-2. Copy the Markdown table to a `<model>.md` file
+1. Use [print_profile_docs](#print_profile_docs-source) macro to generate the profile as a Markdown table wrapped in a Jinja `docs` macro
+2. Copy the output to a `docs/dbt_profiler/<model>.md` file
 ```
-# customer.md
+# docs/dbt_profiler/customer.md
 {% docs dbt_profiler__customer %}
 
 | column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | profiled_at                   |
@@ -173,6 +173,39 @@ This what the profile looks like on the dbt docs site:
  <img src=".github/dbt_docs_example.png" alt="dbt docs example"/>
 </p>
 
+## print_profile_docs ([source](macros/print_profile_docs.sql))
+
+This macro prints a relation profile as a Markdown table wrapped in a Jinja `docs` macro to `stdout`.
+
+### Arguments
+* `relation_name` (required): Relation name
+* `docs_name` (optional): `docs` macro name (default: `dbt_profiler__{{ relation_name }}`)
+* `schema` (optional): Relation schema name (default: target schema)
+* `max_rows` (optional): The maximum number of rows to display before truncating the data
+* `max_columns` (optional): The maximum number of columns to display before truncating the data
+* `max_column_width` (optional): Truncate all columns to at most this width
+* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: no limit)
+
+
+### Usage
+Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+```bash
+dbt run-operation print_profile_docs --args '{"relation_name": "customers"}'
+```
+
+### Example output
+
+```
+{% docs dbt_profiler__customers  %}
+| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | profiled_at                   |
+| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ----------------------------- |
+| customer_id             | integer   |                1.00 |                1.00 |            100 |      True | 2021-04-28 11:36:59.431462+00 |
+| first_order             | date      |                0.62 |                0.46 |             46 |     False | 2021-04-28 11:36:59.431462+00 |
+| most_recent_order       | date      |                0.62 |                0.52 |             52 |     False | 2021-04-28 11:36:59.431462+00 |
+| number_of_orders        | bigint    |                0.62 |                0.04 |              4 |     False | 2021-04-28 11:36:59.431462+00 |
+| customer_lifetime_value | bigint    |                0.62 |                0.35 |             35 |     False | 2021-04-28 11:36:59.431462+00 |
+{% enddocs %}
+```
 
 ## get_profile ([source](macros/get_profile.sql))
 
