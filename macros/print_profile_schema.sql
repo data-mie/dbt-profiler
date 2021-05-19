@@ -7,11 +7,7 @@
   {% for row in results.rows %}
 
     {% set row_dict = row.dict() %}
-    {% if "column_name" in row_dict %}
-      {% set column_name = row_dict.pop("column_name") %}
-    {% else %}
-      {% set column_name = row_dict.pop("COLUMN_NAME") %}
-    {% endif %}
+    {% set column_name = row_dict.pop("column_name") %}
 
     {% set meta_dict = {} %}
     {% for key, value in row_dict.items() %}

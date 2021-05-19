@@ -47,6 +47,7 @@ set relation = adapter.get_relation(
 {% endset %}
 
 {% set results = run_query(profile_sql) %}
+{% set results = results.rename(results.column_names | map('lower')) %}
 {% do return(results) %}
 
 {% endmacro %}
