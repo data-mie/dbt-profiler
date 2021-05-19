@@ -61,3 +61,7 @@ jobs:
       - name: Run print_profile_schema macro
         run: |
           dbt run-operation print_profile_schema --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'
+
+      - name: Run print_profile_docs
+        run: |
+          dbt run-operation print_profile_docs --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'
