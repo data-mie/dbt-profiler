@@ -73,11 +73,11 @@ This macro prints a relation profile as a Markdown table to `stdout`.
 
 ### Arguments
 * `relation_name` (required): Relation name
-* `schema` (optional): Relation schema name (default: target schema)
-* `max_rows` (optional): The maximum number of rows to display before truncating the data
-* `max_columns` (optional): The maximum number of columns to display before truncating the data
-* `max_column_width` (optional): Truncate all columns to at most this width
-* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: no limit)
+* `schema` (optional): Relation schema name (default: `none` i.e., target schema)
+* `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
+* `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
+* `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
+* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: `none` i.e., not limited)
 
 ### Usage
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
@@ -102,9 +102,9 @@ This macro prints a relation schema YAML to `stdout` containing all columns and 
 
 ### Arguments
 * `relation_name` (required): Relation name
-* `schema` (optional): Relation schema name (default: target schema)
-* `model_description` (optional): Model description included in the schema
-* `column_description` (optional): Column descriptions included in the schema
+* `schema` (optional): Relation schema name (default: `none` i.e., target schema)
+* `model_description` (optional): Model description included in the schema (default: `""`)
+* `column_description` (optional): Column descriptions included in the schema (default: `""`)
 
 ### Usage
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
@@ -180,11 +180,11 @@ This macro prints a relation profile as a Markdown table wrapped in a Jinja `doc
 ### Arguments
 * `relation_name` (required): Relation name
 * `docs_name` (optional): `docs` macro name (default: `dbt_profiler__{{ relation_name }}`)
-* `schema` (optional): Relation schema name (default: target schema)
-* `max_rows` (optional): The maximum number of rows to display before truncating the data
-* `max_columns` (optional): The maximum number of columns to display before truncating the data
-* `max_column_width` (optional): Truncate all columns to at most this width
-* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: no limit)
+* `schema` (optional): Relation schema name (default: `none` i.e., target schema)
+* `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
+* `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
+* `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
+* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: `none` i.e., not limited)
 
 
 ### Usage
@@ -213,7 +213,7 @@ This macro returns a relation profile as an [agate.Table](https://agate.readthed
 
 ### Arguments
 * `relation_name` (required): Relation name
-* `schema` (optional): Relation schema name. If not specified, default target schema is used.
+* `schema` (optional): Relation schema name (default: `none` i.e., target schema)
 
 ### Usage
 
