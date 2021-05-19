@@ -60,7 +60,7 @@ New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/bu
 ```yml
 packages:
   - git: https://github.com/data-mie/dbt-profiler.git
-    revision: 0.1.0
+    revision: 0.1.1
 ```
 2. Run `dbt deps` to install the package.
 
