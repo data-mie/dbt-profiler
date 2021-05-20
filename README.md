@@ -51,6 +51,7 @@ models:
 # Contents
 * [print_profile](#print_profile-source)
 * [print_profile_schema](#print_profile_schema-source)
+* [print_profile_docs](#print_profile_docs-source)
 * [get_profile](#get_profile-source)
 
 # Installation
