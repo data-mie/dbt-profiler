@@ -14,3 +14,14 @@ integration_tests:
       dbname: dbt
       schema: dbt_profiler_integration_tests_postgres
       threads: 1
+    bigquery:
+      type: bigquery
+      method: service-account
+      project: '{{ env_var("BIGQUERY_PROJECT") }}'
+      dataset: dbt_profiler_integration_tests_bigquery
+      location: US
+      threads: 4
+      keyfile: '{{ env_var("BIGQUERY_KEYFILE") }}'
+      timeout_seconds: 300
+      priority: interactive
+      retries: 1

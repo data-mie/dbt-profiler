@@ -1,8 +1,7 @@
 {% if execute %}
   {% 
     set actual_profile = dbt_profiler.get_profile(
-      relation_name="raw_payments",
-      schema="dbt_profiler_integration_tests_postgres_raw_data"
+      relation_name="raw_payments"
     )
   %}
 
