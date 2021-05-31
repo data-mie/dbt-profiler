@@ -16,5 +16,4 @@ clean-targets:
     - "dbt_modules"
 
 seeds:
-  +schema: raw_data
   +quote_columns: false

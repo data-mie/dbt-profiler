@@ -2,7 +2,7 @@
 
 **NOTE: This is a Work in Progress, please do not integrate any of the implemented macros with production workflows.**
 
-Macros that profile dbt relation columns and create Markdown tables and model `schema.yml` definitions containing said profiles. The macros have been tested with `PostgreSQL` and `Snowflake`.
+Macros that profile dbt relation columns and create Markdown tables and model `schema.yml` definitions containing said profiles. The macros have been tested with `PostgreSQL`, `BigQuery` and `Snowflake`.
 
 # Purpose 
 
@@ -215,6 +215,7 @@ This macro returns a relation profile as an [agate.Table](https://agate.readthed
 ### Arguments
 * `relation_name` (required): Relation name
 * `schema` (optional): Relation schema name (default: `none` i.e., target schema)
+* `database` (optional): Relation database name (default: `none` i.e., target database)
 
 ### Usage
 
