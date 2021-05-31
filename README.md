@@ -215,6 +215,7 @@ This macro returns a relation profile as an [agate.Table](https://agate.readthed
 ### Arguments
 * `relation_name` (required): Relation name
 * `schema` (optional): Relation schema name (default: `none` i.e., target schema)
+* `database` (optional): Relation database name (default: `none` i.e., target database)
 
 ### Usage
 
