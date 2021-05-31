@@ -11,17 +11,18 @@ on:
 
 env:
   DBT_PROFILES_DIR: ./
-  POSTGRES_HOST: postgres
 
 defaults:
   run:
     working-directory: ./integration_tests
 
 jobs:
-  integration_tests:
-    name: integration_tests
+  integration_postgres:
+    name: integration-postgres
     runs-on: ubuntu-latest
     container: python:3.8-buster
+    env:
+      POSTGRES_HOST: postgres
 
     services:
       postgres:
@@ -48,11 +49,10 @@ jobs:
           dbt deps
           dbt --version
 
-      - name: Run seeds
-        run: dbt seed --target postgres
-
-      - name: Run tests - Postgres
-        run: dbt test --target postgres
+      - name: Run tests
+        run: |
+          dbt seed --target postgres
+          dbt test --target postgres
 
       - name: Run print_profile macro
         run: |
@@ -65,3 +65,26 @@ jobs:
       - name: Run print_profile_docs
         run: |
           dbt run-operation print_profile_docs --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'
+
+  integration_bigquery:
+    name: integration-bigquery
+    runs-on: ubuntu-latest
+    container: python:3.8-buster
+    env:
+      BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
+      BIGQUERY_KEYFILE: ./bigquery-service-key.json
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          pip install dbt==0.19.1
+          dbt deps
+          dbt --version
+
+      - name: Run tests
+        run: |
+          echo $BIGQUERY_SERVICE_ACCOUNT_JSON > ${BIGQUERY_KEYFILE}
+          dbt seed --target bigquery
+          dbt test --target bigquery
