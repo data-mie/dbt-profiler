@@ -1,6 +1,8 @@
 # dbt-profiler (beta)
 
-Macros that profile dbt relation columns and create Markdown tables and model `schema.yml` definitions containing said profiles. The macros have been tested with `PostgreSQL`, `BigQuery` and `Snowflake`.
+`dbt-profiler` implements dbt macros for profiling database relations and creating  `doc` blocks and table schemas (`schema.yml`) containing said profiles.
+
+The macros have been tested with `PostgreSQL`, `BigQuery` and `Snowflake`.
 
 # Purpose 
 
