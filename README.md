@@ -2,7 +2,7 @@
 
 **NOTE: This is a Work in Progress, please do not integrate any of the implemented macros with production workflows.**
 
-Macros that profile dbt relation columns and create Markdown tables and model `schema.yml` definitions containing said profiles. The macros have been tested with `PostgreSQL` and `Snowflake`.
+Macros that profile dbt relation columns and create Markdown tables and model `schema.yml` definitions containing said profiles. The macros have been tested with `PostgreSQL`, `BigQuery` and `Snowflake`.
 
 # Purpose 
 
