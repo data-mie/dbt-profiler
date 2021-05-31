@@ -56,15 +56,7 @@ models:
 
 # Installation
 
-New to dbt packages? Read more about them [here](https://docs.getdbt.com/docs/building-a-dbt-project/package-management/).
-1. Include this package in your `packages.yml` file:
-```yml
-packages:
-  - git: https://github.com/data-mie/dbt-profiler.git
-    revision: 0.1.1
-```
-2. Run `dbt deps` to install the package.
-
+Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions.
 
 # Macros
 
