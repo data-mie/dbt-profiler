@@ -87,11 +87,10 @@ jobs:
 
       - name: Test database connection
         run: |
-          echo $BIGQUERY_SERVICE_ACCOUNT_JSON > ${BIGQUERY_KEYFILE}
+          echo "${BIGQUERY_SERVICE_ACCOUNT_JSON}" > ${BIGQUERY_KEYFILE}
           dbt debug --target bigquery
 
       - name: Run tests
         run: |
-          echo $BIGQUERY_SERVICE_ACCOUNT_JSON > ${BIGQUERY_KEYFILE}
           dbt seed --target bigquery
           dbt test --target bigquery
