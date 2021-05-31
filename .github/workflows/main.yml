@@ -11,6 +11,7 @@ on:
 
 env:
   DBT_PROFILES_DIR: ./
+  DBT_VERSION: 0.19.1
 
 defaults:
   run:
@@ -45,7 +46,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install dbt==0.19.1
+          pip install dbt==${DBT_VERSION}
           dbt deps
           dbt --version
 
@@ -56,21 +57,22 @@ jobs:
 
       - name: Run print_profile macro
         run: |
-          dbt run-operation print_profile --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'
+          dbt run-operation print_profile --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres"}'
 
       - name: Run print_profile_schema macro
         run: |
-          dbt run-operation print_profile_schema --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'
+          dbt run-operation print_profile_schema --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres"}'
 
       - name: Run print_profile_docs
         run: |
-          dbt run-operation print_profile_docs --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres_raw_data"}'
+          dbt run-operation print_profile_docs --args '{"relation_name": "raw_payments", "schema": "dbt_profiler_integration_tests_postgres"}'
 
   integration_bigquery:
     name: integration-bigquery
     runs-on: ubuntu-latest
     container: python:3.8-buster
     env:
+      BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
       BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
       BIGQUERY_KEYFILE: ./bigquery-service-key.json
 
@@ -79,7 +81,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install dbt==0.19.1
+          pip install dbt==${DBT_VERSION}
           dbt deps
           dbt --version
 
