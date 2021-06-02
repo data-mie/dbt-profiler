@@ -2,16 +2,19 @@
 
 `dbt-profiler` implements dbt macros for profiling database relations and creating  `doc` blocks and table schemas (`schema.yml`) containing said profiles.
 
-The macros have been tested with `PostgreSQL`, `BigQuery` and `Snowflake`.
-
-# Purpose 
+## Purpose 
 
 `dbt-profiler` aims to provide the following:
 
 1. [print_profile](#print_profile-source) macro for ad-hoc model profiling to support data exploration 
 2. Describe a mechanism to include model profiles in [dbt docs](https://docs.getdbt.com/docs/building-a-dbt-project/documentation)
 
-For the second point there are at least two options: `meta` properties and `doc` blocks. An example of the former is implemented in the [print_profile_schema](#print_profile_schema-source) macro. The latter can be achieved with the following pattern:
+For the second point there are at least two options: 
+
+1. `meta` properties, and 
+2. `doc` blocks. 
+
+An example of the first is implemented in the [print_profile_schema](#print_profile_schema-source) macro. The second can be achieved with the following pattern:
 
 1. Use [print_profile_docs](#print_profile_docs-source) macro to generate the profile as a Markdown table wrapped in a Jinja `docs` macro
 2. Copy the output to a `docs/dbt_profiler/<model>.md` file
@@ -48,15 +51,43 @@ models:
           - unique
 ```
 
+### Continuous integration (CI)
+
+One of the advantages of the `doc` approach over the `meta` approach is that it doesn't require changes to the schema.yml except for the `doc` macro call. Once the macro call has been embedded in the schema the actual profiles can be maintained in a dedicated `dbt_profiler/` directory as Markdown files. The profile files can then be automatically updated by a CI process that runs once a week or month as follows:
+
+1. List the models you want to profile (e.g., using `dbt list --output name -m ${node_selection}`)
+2. For each model run `dbt run-operation print_profile_docs --args '{"relation_name": "'${relation_name}'", "schema": "'${schema}'"}'` and store the result in `dbt_profiler/${relation_name}.md`
+3. Create a Pull Request for the updated profiles (e.g., using [create-pull-request GitHub Action](https://github.com/peter-evans/create-pull-request))
+
+## Installation
+
+Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions.
+
+## Supported adapters
+
+`dbt-profiler` may work with unsupported adapters but they haven't been tested yet. I'll try and get around testing Redshift as soon as I get access to a cluster. If you've used `dbt-profiler` with any of the unsupported adapters I'd love to hear your feedback (e.g., create an issue, PR or hit me with with a DM on [dbt Slack](https://community.getdbt.com/)) 😊
+
+✅ PostgreSQL
+
+✅ BigQuery
+
+✅ Snowflake
+
+❌ Redshift
+
+❌ Apache Spark
+
+❌ Databricks
+
+❌ Presto
+
 # Contents
 * [print_profile](#print_profile-source)
 * [print_profile_schema](#print_profile_schema-source)
 * [print_profile_docs](#print_profile_docs-source)
 * [get_profile](#get_profile-source)
 
-# Installation
 
-Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions.
 
 # Macros
 
