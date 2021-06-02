@@ -53,7 +53,7 @@ models:
 
 ### Continuous integration (CI)
 
-One of the advantages of the `doc` approach over the `meta` approach is that it doesn't require changes to the schema.yml except for the `doc` macro call. Once the macro call has been embedded in the schema the actual profiles can be maintained e.g. in a dedicated `dbt_profiler/` directory as Markdown files. The profile files can then be automatically updated by a CI process (e.g., runs once a week) as follows:
+One of the advantages of the `doc` approach over the `meta` approach is that it doesn't require changes to the schema.yml except for the `doc` macro call. Once the macro call has been embedded in the schema the actual profiles can be maintained in a dedicated `dbt_profiler/` directory as Markdown files. The profile files can then be automatically updated by a CI process that runs once a week or month as follows:
 
 1. List the models you want to profile (e.g., using `dbt list --output name -m ${node_selection}`)
 2. For each model run `dbt run-operation print_profile_docs --args '{"relation_name": "'${relation_name}'", "schema": "'${schema}'"}'` and store the result in `dbt_profiler/${relation_name}.md`
