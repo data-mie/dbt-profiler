@@ -65,7 +65,7 @@ Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the la
 
 ## Supported adapters
 
-`dbt-profiler` may work with unsupported adapters but it hasn't been tested. I'll try and get around testing Redshift as soon as I get access to a cluster. If you've used `dbt-profiler` with any of the unsupported adapters I'd love to hear your feedback (e.g., create an issue, PR or hit me with with a DM on [dbt Slack](https://community.getdbt.com/)) 😊
+`dbt-profiler` may work with unsupported adapters but they haven't been tested yet. I'll try and get around testing Redshift as soon as I get access to a cluster. If you've used `dbt-profiler` with any of the unsupported adapters I'd love to hear your feedback (e.g., create an issue, PR or hit me with with a DM on [dbt Slack](https://community.getdbt.com/)) 😊
 
 ✅ PostgreSQL
 
