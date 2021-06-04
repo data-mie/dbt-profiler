@@ -59,15 +59,15 @@ jobs:
 
       - name: Run print_profile macro
         run: |
-          dbt run-operation print_profile --args '{"relation_name": "' $INTEGRATION_TEST_RELATION '", "schema": "' $INTEGRATION_TEST_SCHEMA '"}'
+          dbt run-operation print_profile --args '{"relation_name": "'$INTEGRATION_TEST_RELATION'", "schema": "'$INTEGRATION_TEST_SCHEMA'"}'
 
       - name: Run print_profile_schema macro
         run: |
-          dbt run-operation print_profile_schema --args '{"relation_name": "' $INTEGRATION_TEST_RELATION '", "schema": "' $INTEGRATION_TEST_SCHEMA '"}'
+          dbt run-operation print_profile_schema --args '{"relation_name": "'$INTEGRATION_TEST_RELATION'", "schema": "'$INTEGRATION_TEST_SCHEMA'"}'
 
       - name: Run print_profile_docs
         run: |
-          dbt run-operation print_profile_docs --args '{"relation_name": "' $INTEGRATION_TEST_RELATION '", "schema": "' $INTEGRATION_TEST_SCHEMA '"}'
+          dbt run-operation print_profile_docs --args '{"relation_name": "'$INTEGRATION_TEST_RELATION'", "schema": "'$INTEGRATION_TEST_SCHEMA'"}'
 
   integration_bigquery:
     name: integration-bigquery
