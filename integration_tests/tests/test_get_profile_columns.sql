@@ -1,7 +1,7 @@
 {% if execute %}
   {% 
     set actual_profile = dbt_profiler.get_profile(
-      relation_name="raw_payments"
+      relation_name="test_data"
     )
   %}
 
