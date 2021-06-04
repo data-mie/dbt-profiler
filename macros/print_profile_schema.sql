@@ -32,7 +32,7 @@
   {% set schema_yaml = toyaml(schema_dict) %}
 
   {{ log(schema_yaml, info=True) }}
-  {% do return(schema_yaml) %}
+  {% do return(schema_dict) %}
 {% endif %}
 
 {% endmacro %}

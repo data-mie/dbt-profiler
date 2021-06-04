@@ -1,6 +1,6 @@
 {% macro print_profile_docs(relation_name, docs_name=none, schema=none, max_rows=none, max_columns=7, max_column_width=30, max_precision=none) %}
 
-{%- set results = get_profile(relation_name, schema=schema) -%}
+{%- set results = dbt_profiler.get_profile(relation_name, schema=schema) -%}
 
 {% if docs_name is none %}
   {% set docs_name = 'dbt_profiler__' + relation_name %}
