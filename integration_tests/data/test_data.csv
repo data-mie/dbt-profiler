@@ -1,0 +1,6 @@
+id,numeric_not_nullable,numeric_nullable,string_not_nullable,string_nullable
+1,1,1,one,one
+2,2,,two,
+3,3,3,three,three
+4,2,,two,
+5,1,1,one,one
