@@ -57,6 +57,8 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 
 1. List the models you want to profile (e.g., using `dbt list --output name -m ${node_selection}`)
 2. For each model run `dbt run-operation print_profile_docs --args '{"relation_name": "'${relation_name}'", "schema": "'${schema}'"}'` and store the result in `dbt_profiler/${relation_name}.md`
+  * Note that you need to store the `dbt run-operation print_profile_docs` output in e.g. a variable before piping it to the target file. Piping the output directly to a file (e.g., `dbt run-operation print_profile_docs > ${relation_name}.md`) will result in a situation where the target file is emptied before `dbt run-operation` compiles the dbt project which will throw an error if you're already referring to the `doc` block that the operation has not yet generated. See example [update-relation-profile.sh](update-relation-profile.sh) script.
+
 3. Create a Pull Request for the updated profiles (e.g., using [create-pull-request GitHub Action](https://github.com/peter-evans/create-pull-request))
 
 ## Installation
