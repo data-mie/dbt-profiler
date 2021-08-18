@@ -17,4 +17,7 @@ output_dir=docs/dbt_profiler/$schema
 output_path=$output_dir/$relation_name.md
 mkdir -p $output_dir
 echo "$PROFILE" > $output_path
-echo "Profile updated: $output_path"
+
+# Print file path and contents
+echo $output_path
+cat $output_path
