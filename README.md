@@ -1,4 +1,4 @@
-# dbt-profiler (beta)
+# dbt-profiler
 
 `dbt-profiler` implements dbt macros for profiling database relations and creating  `doc` blocks and table schemas (`schema.yml`) containing said profiles.
 
