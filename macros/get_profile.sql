@@ -16,6 +16,10 @@ set relation = adapter.get_relation(
 ) 
 -%}
 
+{% if relation is none %}
+  {{ exceptions.raise_compiler_error("Relation " ~ adapter.quote(relation_name) ~ " does not exist or not authorized.") }}
+{% endif %}
+
 {%- set columns = adapter.get_columns_in_relation(relation) -%}
 {%- set column_names = columns | map(attribute="name") -%}
 
