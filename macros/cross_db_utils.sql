@@ -1,7 +1,7 @@
 {# type_string  -------------------------------------------------     #}
 
 {%- macro type_string() -%}
-  {{ return(adapter.dispatch("type_string", packages = ["dbt_profiler"])()) }}
+  {{ return(adapter.dispatch("type_string", macro_namespace="dbt_profiler")()) }}
 {%- endmacro -%}
 
 {%- macro default__type_string() -%}
@@ -16,7 +16,7 @@
 {# information_schema  -------------------------------------------------     #}
 
 {%- macro information_schema(relation) -%}
-  {{ return(adapter.dispatch("information_schema", packages = ["dbt_profiler"])(relation)) }}
+  {{ return(adapter.dispatch("information_schema", macro_namespace="dbt_profiler")(relation)) }}
 {%- endmacro -%}
 
 {%- macro default__information_schema(relation) -%}
