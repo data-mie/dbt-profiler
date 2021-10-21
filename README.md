@@ -100,6 +100,7 @@ This macro prints a relation profile as a Markdown table to `stdout`.
 ### Arguments
 * `relation_name` (required): Relation name
 * `schema` (optional): Relation schema name (default: `none` i.e., target schema)
+* `database` (optional): Relation database name (default: `none` i.e., target database)
 * `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
 * `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
@@ -129,6 +130,7 @@ This macro prints a relation schema YAML to `stdout` containing all columns and 
 ### Arguments
 * `relation_name` (required): Relation name
 * `schema` (optional): Relation schema name (default: `none` i.e., target schema)
+* `database` (optional): Relation database name (default: `none` i.e., target database)
 * `model_description` (optional): Model description included in the schema (default: `""`)
 * `column_description` (optional): Column descriptions included in the schema (default: `""`)
 
@@ -207,6 +209,7 @@ This macro prints a relation profile as a Markdown table wrapped in a Jinja `doc
 * `relation_name` (required): Relation name
 * `docs_name` (optional): `docs` macro name (default: `dbt_profiler__{{ relation_name }}`)
 * `schema` (optional): Relation schema name (default: `none` i.e., target schema)
+* `database` (optional): Relation database name (default: `none` i.e., target database)
 * `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
 * `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
