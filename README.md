@@ -63,7 +63,7 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 
 ## Installation
 
-Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions.
+`dbt-profiler` requires dbt version `>=0.19.2`. Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions. 
 
 ## Supported adapters
 
