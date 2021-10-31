@@ -67,7 +67,7 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 
 ## Supported adapters
 
-`dbt-profiler` may work with unsupported adapters but they haven't been tested yet. I'll try and get around testing Redshift as soon as I get access to a cluster. If you've used `dbt-profiler` with any of the unsupported adapters I'd love to hear your feedback (e.g., create an issue, PR or hit me with with a DM on [dbt Slack](https://community.getdbt.com/)) 😊
+`dbt-profiler` may work with unsupported adapters but they haven't been tested yet. If you've used `dbt-profiler` with any of the unsupported adapters I'd love to hear your feedback (e.g., create an issue, PR or hit me with with a DM on [dbt Slack](https://community.getdbt.com/)) 😊
 
 ✅ PostgreSQL
 
@@ -75,7 +75,7 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 
 ✅ Snowflake
 
-❌ Redshift
+✅ Redshift
 
 ❌ Apache Spark
 
