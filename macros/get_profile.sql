@@ -39,7 +39,12 @@ set relation = adapter.get_relation(
 
       {% if not loop.last %}union all{% endif %}
     {% endfor %}
+  ),
+
+  columns as (
+    {{ dbt_profiler.select_from_information_schema_columns(relation, schema, relation_name) }}
   )
+
   select
     column_profiles.column_name,
     columns.data_type,
@@ -49,11 +54,7 @@ set relation = adapter.get_relation(
     column_profiles.is_unique,
     column_profiles.profiled_at
   from column_profiles
-  left join {{ dbt_profiler.information_schema(relation) }}.COLUMNS as columns on (
-    lower(columns.table_schema) = lower('{{ schema }}') and
-    lower(columns.table_name) = lower('{{ relation_name }}') and
-    lower(columns.column_name) = lower(column_profiles.column_name)
-  )
+  left join columns on (lower(columns.column_name) = lower(column_profiles.column_name))
 {% endset %}
 
 {% set results = run_query(profile_sql) %}
