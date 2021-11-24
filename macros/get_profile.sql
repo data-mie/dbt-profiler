@@ -8,6 +8,9 @@
   {% set database = target.database %}
 {% endif %}
 
+
+{{ log("Get relation %s (database=%s, schema=%s)" | format(adapter.quote(relation_name), adapter.quote(database), adapter.quote(schema)), info=False) }}
+
 {%- 
 set relation = adapter.get_relation(
   database=database,
