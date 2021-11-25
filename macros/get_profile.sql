@@ -22,7 +22,7 @@
   ),
 
   columns as (
-    {{ dbt_profiler.select_from_information_schema_columns(relation, schema, relation.identifier) }}
+    {{ dbt_profiler.select_from_information_schema_columns(relation) }}
   )
 
   select
