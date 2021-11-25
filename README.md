@@ -131,9 +131,8 @@ This macro returns a relation profile as an [agate.Table](https://agate.readthed
 
 Call this macro from another macro or dbt model:
 
-
-```bash
-{{ get_profile_table(relation_name="customers") }}
+```sql
+{% set table = dbt_profiler.get_profile_table(relation_name="customers") %}
 ```
 
 ## print_profile ([source](macros/print_profile.sql))
