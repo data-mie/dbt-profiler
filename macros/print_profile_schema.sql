@@ -1,7 +1,7 @@
 {% macro print_profile_schema(relation=none, relation_name=none, schema=none, database=none, model_description="", column_description="") %}
 
 {%- set column_dicts = [] -%}
-{%- set results = dbt_profiler.get_profile(relation=relation, relation_name=relation_name, schema=schema, database=database) -%}
+{%- set results = dbt_profiler.get_profile_table(relation=relation, relation_name=relation_name, schema=schema, database=database) -%}
 
 {% if execute %}
   {% for row in results.rows %}

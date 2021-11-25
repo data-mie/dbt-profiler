@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: profile
+    columns:
+      - name: column_name
+        tests:
+          - not_null
+          - unique
+
+      - name: data_type
+        tests:
+          - not_null
+
+      - name: not_null_proportion
+        tests:
+          - not_null
+
+      - name: distinct_proportion
+        tests:
+          - not_null
+
+      - name: distinct_count
+        tests:
+          - not_null
+
+      - name: is_unique
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
+      - name: profiled_at
+        tests:
+          - not_null
