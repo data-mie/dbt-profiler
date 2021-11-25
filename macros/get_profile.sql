@@ -1,32 +1,34 @@
-{% macro get_profile(relation_name, schema=none, database=none) %}
+{% macro get_profile(relation=none, relation_name=none, schema=none, database=none) %}
 
-{% if schema is none %}
-  {% set schema = target.schema %}
+{% if relation is none and relation_name is none %}
+  {{ exceptions.raise_compiler_error("Either relation or relation_name must be specified.") }}
 {% endif %}
-
-{% if database is none %}
-  {% set database = target.database %}
-{% endif %}
-
-
-{{ log("Get relation %s (database=%s, schema=%s)" | format(adapter.quote(relation_name), adapter.quote(database), adapter.quote(schema)), info=False) }}
-
-{%- 
-set relation = adapter.get_relation(
-  database=database,
-  schema=schema,
-  identifier=relation_name
-) 
--%}
 
 {% if relation is none %}
-  {{ exceptions.raise_compiler_error("Relation " ~ adapter.quote(relation_name) ~ " does not exist or not authorized.") }}
+  {% if schema is none %}
+    {% set schema = target.schema %}
+  {% endif %}
+
+  {% if database is none %}
+    {% set database = target.database %}
+  {% endif %}
+
+  {{ log("Get relation %s (database=%s, schema=%s)" | format(adapter.quote(relation_name), adapter.quote(database), adapter.quote(schema)), info=False) }}
+
+  {%- 
+  set relation = adapter.get_relation(
+    database=database,
+    schema=schema,
+    identifier=relation_name
+  ) 
+  -%}
+  {% if relation is none %}
+    {{ exceptions.raise_compiler_error("Relation " ~ adapter.quote(relation_name) ~ " does not exist or not authorized.") }}
+  {% endif %}
 {% endif %}
 
 {%- set columns = adapter.get_columns_in_relation(relation) -%}
 {%- set column_names = columns | map(attribute="name") -%}
-
-
 
 {% set profile_sql %}
   with column_profiles as (
