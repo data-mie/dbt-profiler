@@ -30,19 +30,19 @@
 
 {# select_from_information_schema_columns  -------------------------------------------------     #}
 
-{%- macro select_from_information_schema_columns(relation, schema, relation_name) -%}
-  {{ return(adapter.dispatch("select_from_information_schema_columns", macro_namespace="dbt_profiler")(relation, schema, relation_name)) }}
+{%- macro select_from_information_schema_columns(relation) -%}
+  {{ return(adapter.dispatch("select_from_information_schema_columns", macro_namespace="dbt_profiler")(relation)) }}
 {%- endmacro -%}
 
-{%- macro default__select_from_information_schema_columns(relation, schema, relation_name) -%}
+{%- macro default__select_from_information_schema_columns(relation) -%}
   select
     *
   from {{ dbt_profiler.information_schema(relation) }}.COLUMNS
-  where lower(table_schema) = lower('{{ schema }}') 
-    and lower(table_name) = lower('{{ relation_name }}')
+  where lower(table_schema) = lower('{{ relation.schema }}') 
+    and lower(table_name) = lower('{{ relation.identifier }}')
 {%- endmacro -%}
 
-{%- macro redshift__select_from_information_schema_columns(relation, schema, relation_name) -%}
+{%- macro redshift__select_from_information_schema_columns(relation) -%}
   select
     attr.attname::varchar as column_name,
     type.typname::varchar as data_type,
@@ -52,7 +52,7 @@
   join pg_catalog.pg_type as type on (attr.atttypid = type.oid)
   join pg_catalog.pg_class as class on (attr.attrelid = class.oid)
   join pg_catalog.pg_namespace as namespace on (class.relnamespace = namespace.oid)
-  where lower(table_schema) = lower('{{ schema }}') 
-    and lower(table_name) = lower('{{ relation_name }}')
+  where lower(table_schema) = lower('{{ relation.schema }}') 
+    and lower(table_name) = lower('{{ relation.identifier }}')
     and attr.attnum > 0
 {%- endmacro -%}

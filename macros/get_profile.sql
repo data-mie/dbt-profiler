@@ -1,29 +1,9 @@
-{% macro get_profile(relation_name, schema=none, database=none) %}
+{% macro get_profile(relation=none) %}
 
-{% if schema is none %}
-  {% set schema = target.schema %}
-{% endif %}
-
-{% if database is none %}
-  {% set database = target.database %}
-{% endif %}
-
-{%- 
-set relation = adapter.get_relation(
-  database=database,
-  schema=schema,
-  identifier=relation_name
-) 
--%}
-
-{% if relation is none %}
-  {{ exceptions.raise_compiler_error("Relation " ~ adapter.quote(relation_name) ~ " does not exist or not authorized.") }}
-{% endif %}
-
+{{ log("Get columns in relation %s" | format(relation.include()), info=False) }}
 {%- set columns = adapter.get_columns_in_relation(relation) -%}
-{%- set column_names = columns | map(attribute="name") -%}
-
-
+{%- set column_names = columns | map(attribute="name") | list -%}
+{{ log("Columns: " ~ column_names | join(', '), info=False) }}
 
 {% set profile_sql %}
   with column_profiles as (
@@ -42,7 +22,7 @@ set relation = adapter.get_relation(
   ),
 
   columns as (
-    {{ dbt_profiler.select_from_information_schema_columns(relation, schema, relation_name) }}
+    {{ dbt_profiler.select_from_information_schema_columns(relation) }}
   )
 
   select
@@ -57,8 +37,6 @@ set relation = adapter.get_relation(
   left join columns on (lower(columns.column_name) = lower(column_profiles.column_name))
 {% endset %}
 
-{% set results = run_query(profile_sql) %}
-{% set results = results.rename(results.column_names | map('lower')) %}
-{% do return(results) %}
+{% do return(profile_sql) %}
 
 {% endmacro %}

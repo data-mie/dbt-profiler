@@ -84,23 +84,66 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 ❌ Presto
 
 # Contents
+* [get_profile](#get_profile-source)
+* [get_profile_table](#get_profile_table-source)
 * [print_profile](#print_profile-source)
 * [print_profile_schema](#print_profile_schema-source)
 * [print_profile_docs](#print_profile_docs-source)
-* [get_profile](#get_profile-source)
-
 
 
 # Macros
+
+## get_profile ([source](macros/get_profile.sql))
+
+This macro returns a relation profile as a SQL query that can be used in a dbt model. This is handy for previewing relation profiles in dbt Cloud.
+
+### Arguments
+* `relation` (required): [Relation](https://docs.getdbt.com/reference/dbt-classes#relation) object
+
+### Usage
+
+Use this macro in a dbt model:
+
+```sql
+{{ dbt_profiler.get_profile(relation=ref("customers")) }}
+```
+
+To configure the macro to be called only when dbt is in [execute](https://docs.getdbt.com/reference/dbt-jinja-functions/execute) mode:
+
+```sql
+-- depends_on: {{ ref("customers") }}
+{% if execute %}
+    {{ dbt_profiler.get_profile(relation=ref("customers")) }}
+{% endif %}
+```
+
+## get_profile_table ([source](macros/get_profile_table.sql))
+
+This macro returns a relation profile as an [agate.Table](https://agate.readthedocs.io/en/1.6.1/api/table.html#module-agate.table). The macro does not print anything to `stdout` and therefore is not meant to be used as a standalone [operation](https://docs.getdbt.com/docs/using-operations).
+
+### Arguments
+* `relation` (either `relation` or `relation_name` is required): Relation object
+* `relation_name` (either `relation` or `relation_name` is required): Relation name
+* `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
+* `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
+
+### Usage
+
+Call this macro from another macro or dbt model:
+
+```sql
+{% set table = dbt_profiler.get_profile_table(relation_name="customers") %}
+```
 
 ## print_profile ([source](macros/print_profile.sql))
 
 This macro prints a relation profile as a Markdown table to `stdout`.
 
 ### Arguments
-* `relation_name` (required): Relation name
-* `schema` (optional): Relation schema name (default: `none` i.e., target schema)
-* `database` (optional): Relation database name (default: `none` i.e., target database)
+* `relation` (either `relation` or `relation_name` is required): Relation object
+* `relation_name` (either `relation` or `relation_name` is required): Relation name
+* `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
+* `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
 * `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
 * `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
@@ -128,9 +171,10 @@ dbt run-operation print_profile --args '{"relation_name": "customers"}'
 This macro prints a relation schema YAML to `stdout` containing all columns and their profiles.
 
 ### Arguments
-* `relation_name` (required): Relation name
-* `schema` (optional): Relation schema name (default: `none` i.e., target schema)
-* `database` (optional): Relation database name (default: `none` i.e., target database)
+* `relation` (either `relation` or `relation_name` is required): Relation object
+* `relation_name` (either `relation` or `relation_name` is required): Relation name
+* `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
+* `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
 * `model_description` (optional): Model description included in the schema (default: `""`)
 * `column_description` (optional): Column descriptions included in the schema (default: `""`)
 
@@ -206,10 +250,11 @@ This what the profile looks like on the dbt docs site:
 This macro prints a relation profile as a Markdown table wrapped in a Jinja `docs` macro to `stdout`.
 
 ### Arguments
-* `relation_name` (required): Relation name
+* `relation` (either `relation` or `relation_name` is required): Relation object
+* `relation_name` (either `relation` or `relation_name` is required): Relation name
+* `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
+* `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
 * `docs_name` (optional): `docs` macro name (default: `dbt_profiler__{{ relation_name }}`)
-* `schema` (optional): Relation schema name (default: `none` i.e., target schema)
-* `database` (optional): Relation database name (default: `none` i.e., target database)
 * `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
 * `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
@@ -234,21 +279,4 @@ dbt run-operation print_profile_docs --args '{"relation_name": "customers"}'
 | number_of_orders        | bigint    |                0.62 |                0.04 |              4 |     False | 2021-04-28 11:36:59.431462+00 |
 | customer_lifetime_value | bigint    |                0.62 |                0.35 |             35 |     False | 2021-04-28 11:36:59.431462+00 |
 {% enddocs %}
-```
-
-## get_profile ([source](macros/get_profile.sql))
-
-This macro returns a relation profile as an [agate.Table](https://agate.readthedocs.io/en/1.6.1/api/table.html#module-agate.table). The macro does not print anything to `stdout` and therefore is not meant to be used as a standalone [operation](https://docs.getdbt.com/docs/using-operations).
-
-### Arguments
-* `relation_name` (required): Relation name
-* `schema` (optional): Relation schema name (default: `none` i.e., target schema)
-* `database` (optional): Relation database name (default: `none` i.e., target database)
-
-### Usage
-
-Call this macro from another macro or dbt model:
-
-```bash
-{{ get_profile(relation_name="customers") }}
 ```

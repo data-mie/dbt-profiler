@@ -55,6 +55,7 @@ jobs:
       - name: Run tests
         run: |
           dbt seed --target postgres
+          dbt run --target postgres
           dbt test --target postgres
 
       - name: Run print_profile macro
@@ -98,4 +99,5 @@ jobs:
       - name: Run tests
         run: |
           dbt seed --target bigquery
+          dbt run --target bigquery
           dbt test --target bigquery

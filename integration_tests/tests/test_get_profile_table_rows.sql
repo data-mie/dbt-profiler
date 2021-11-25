@@ -1,6 +1,6 @@
 {% if execute %}
   {% 
-    set actual_profile = dbt_profiler.get_profile(
+    set actual_profile = dbt_profiler.get_profile_table(
       relation_name="test_data"
     ).exclude(["profiled_at", "data_type"])
   %}
