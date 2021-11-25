@@ -28,7 +28,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: [true, false]
+              quote: false
+              values: ["TRUE", "FALSE"]
 
       - name: profiled_at
         tests:
