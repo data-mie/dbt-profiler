@@ -95,17 +95,23 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 
 ## get_profile ([source](macros/get_profile.sql))
 
-This macro returns a relation profile as a SQL query that can be used in a dbt model. This is handy for previewing relation profiles in dbt Cloud.
+This macro returns a relation profile as a SQL query that can be used in a dbt model. This is handy for previewing relation profiles in dbt Cloud. 
 
 ### Arguments
 * `relation` (required): [Relation](https://docs.getdbt.com/reference/dbt-classes#relation) object
 
 ### Usage
 
-Use this macro in a dbt model:
+Use this macro in a dbt model, using a [ref()](https://docs.getdbt.com/reference/dbt-jinja-functions/ref):
 
 ```sql
 {{ dbt_profiler.get_profile(relation=ref("customers")) }}
+```
+
+Use this macro in a dbt model, using a [source()](https://docs.getdbt.com/reference/dbt-jinja-functions/source):
+
+```sql
+{{ dbt_profiler.get_profile(relation=source("jaffle_shop","customers")) }}
 ```
 
 To configure the macro to be called only when dbt is in [execute](https://docs.getdbt.com/reference/dbt-jinja-functions/execute) mode:
