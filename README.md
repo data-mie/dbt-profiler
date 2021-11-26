@@ -95,7 +95,7 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 
 ## get_profile ([source](macros/get_profile.sql))
 
-This macro returns a relation profile as a SQL query that can be used in a dbt model. This is handy for previewing relation profiles in dbt Cloud. 
+This macro returns a relation profile as a SQL query that can be used in a dbt model. This is handy for previewing relation profiles in dbt Cloud.
 
 ### Arguments
 * `relation` (required): [Relation](https://docs.getdbt.com/reference/dbt-classes#relation) object
