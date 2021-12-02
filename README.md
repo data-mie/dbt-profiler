@@ -102,10 +102,16 @@ This macro returns a relation profile as a SQL query that can be used in a dbt m
 
 ### Usage
 
-Use this macro in a dbt model:
+Use this macro in a dbt model, using a [ref()](https://docs.getdbt.com/reference/dbt-jinja-functions/ref):
 
 ```sql
 {{ dbt_profiler.get_profile(relation=ref("customers")) }}
+```
+
+Use this macro in a dbt model, using a [source()](https://docs.getdbt.com/reference/dbt-jinja-functions/source):
+
+```sql
+{{ dbt_profiler.get_profile(relation=source("jaffle_shop","customers")) }}
 ```
 
 To configure the macro to be called only when dbt is in [execute](https://docs.getdbt.com/reference/dbt-jinja-functions/execute) mode:
