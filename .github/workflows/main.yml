@@ -15,9 +15,6 @@ env:
   INTEGRATION_TEST_RELATION: test_data
   INTEGRATION_TEST_SCHEMA: dbt_profiler_integration_tests_postgres
   POSTGRES_HOST: postgres
-  POSTGRES_DB: dbt
-  POSTGRES_USER: dbt
-  POSTGRES_PASSWORD: dbt
   BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
   BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
   BIGQUERY_KEYFILE: ./bigquery-service-key.json
@@ -36,6 +33,10 @@ jobs:
         image: postgres
         ports:
           - 5432:5432
+        env:
+          POSTGRES_USER: dbt
+          POSTGRES_PASSWORD: dbt
+          POSTGRES_DB: dbt
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
