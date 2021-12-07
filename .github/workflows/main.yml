@@ -14,6 +14,13 @@ env:
   DBT_VERSION: 1.0.0
   INTEGRATION_TEST_RELATION: test_data
   INTEGRATION_TEST_SCHEMA: dbt_profiler_integration_tests_postgres
+  POSTGRES_HOST: postgres
+  POSTGRES_DB: dbt
+  POSTGRES_USER: dbt
+  POSTGRES_PASSWORD: dbt
+  BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
+  BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
+  BIGQUERY_KEYFILE: ./bigquery-service-key.json
 
 defaults:
   run:
@@ -24,16 +31,9 @@ jobs:
     name: integration-postgres
     runs-on: ubuntu-latest
     container: python:3.8-buster
-    env:
-      POSTGRES_HOST: postgres
-
     services:
       postgres:
         image: postgres
-        env:
-          POSTGRES_USER: dbt
-          POSTGRES_PASSWORD: dbt
-          POSTGRES_DB: dbt
         ports:
           - 5432:5432
         # Set health checks to wait until postgres has started
@@ -42,7 +42,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - uses: actions/checkout@v2
 
@@ -77,11 +76,6 @@ jobs:
     name: integration-bigquery
     runs-on: ubuntu-latest
     container: python:3.8-buster
-    env:
-      BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
-      BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
-      BIGQUERY_KEYFILE: ./bigquery-service-key.json
-
     steps:
       - uses: actions/checkout@v2
 
