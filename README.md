@@ -6,10 +6,11 @@
 
 `dbt-profiler` aims to provide the following:
 
-1. [print_profile](#print_profile-source) macro for ad-hoc model profiling to support data exploration 
-2. Describe a mechanism to include model profiles in [dbt docs](https://docs.getdbt.com/docs/building-a-dbt-project/documentation)
+1. [get_profile](#get_profile-source) macro for generating profiling SQL queries that can be used as dbt models or ad-hoc queries
+2. [print_profile](#print_profile-source) macro for ad-hoc model profiling to support data exploration 
+3. Describe a mechanism to include model profiles in [dbt docs](https://docs.getdbt.com/docs/building-a-dbt-project/documentation)
 
-For the second point there are at least two options: 
+For the third point there are at least two options: 
 
 1. `meta` properties, and 
 2. `doc` blocks. 

@@ -1,5 +1,5 @@
 name: "dbt_profiler"
-version: "0.1.0"
+version: "0.2.1"
 
 require-dbt-version: ">=0.19.2"
 config-version: 2
