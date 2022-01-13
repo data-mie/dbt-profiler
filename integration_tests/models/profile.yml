@@ -38,7 +38,17 @@ models:
       - name: average
         tests:
           - not_null:
-              where: column_name not like 'string%'
+              where: &column_is_numeric column_name not like 'string%'
+
+      - name: min
+        tests:
+          - not_null:
+              where: *column_is_numeric
+
+      - name: max
+        tests:
+          - not_null:
+              where: *column_is_numeric
 
       - name: profiled_at
         tests:

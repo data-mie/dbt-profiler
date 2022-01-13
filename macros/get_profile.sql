@@ -29,6 +29,8 @@
         count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as numeric) as distinct_proportion,
         count(distinct {{ adapter.quote(column_name) }}) as distinct_count,
         count(distinct {{ adapter.quote(column_name) }}) = count(*) as is_unique,
+        {% if dbt_profiler.is_numeric_dtype(data_type) %}min({{ adapter.quote(column_name) }}){% else %}null{% endif %} as min,
+        {% if dbt_profiler.is_numeric_dtype(data_type) %}max({{ adapter.quote(column_name) }}){% else %}null{% endif %} as max,
         {% if dbt_profiler.is_numeric_dtype(data_type) %}avg({{ adapter.quote(column_name) }}){% else %}null{% endif %} as average,
         cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at
       from {{ relation }}
