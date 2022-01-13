@@ -20,7 +20,7 @@
 {%- endmacro -%}
 
 {%- macro default__is_numeric_dtype(dtype) -%}
-  {% set is_numeric = "int" in dtype or "float" in dtype or "numeric" in dtype or "number" in dtype %}
+  {% set is_numeric = dtype.startswith("int") or dtype.startswith("float") or "numeric" in dtype or "number" in dtype or "double" in dtype %}
   {% do return(is_numeric) %}
 {%- endmacro -%}
 

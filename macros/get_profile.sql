@@ -1,5 +1,7 @@
 {% macro get_profile(relation=none) %}
 
+{% do dbt_profiler.assert_relation_exists(relation) %}
+
 {{ log("Get columns in relation %s" | format(relation.include()), info=False) }}
 {%- set columns = adapter.get_columns_in_relation(relation) -%}
 {%- set column_names = columns | map(attribute="name") | list -%}
