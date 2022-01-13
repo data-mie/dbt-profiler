@@ -35,6 +35,11 @@ models:
               quote: false
               values: ["TRUE", "FALSE"]
 
+      - name: average
+        tests:
+          - not_null:
+              where: column_name not like 'string%'
+
       - name: profiled_at
         tests:
           - not_null
