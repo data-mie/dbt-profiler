@@ -24,6 +24,18 @@
   {% do return(is_numeric) %}
 {%- endmacro -%}
 
+
+{# is_date_or_time_dtype  -------------------------------------------------     #}
+
+{%- macro is_date_or_time_dtype(dtype) -%}
+  {{ return(adapter.dispatch("is_date_or_time_dtype", macro_namespace="dbt_profiler")(dtype)) }}
+{%- endmacro -%}
+
+{%- macro default__is_date_or_time_dtype(dtype) -%}
+  {% set is_date_or_time = dtype.startswith("timestamp") or dtype.startswith("date") %}
+  {% do return(is_date_or_time) %}
+{%- endmacro -%}
+
 {# information_schema  -------------------------------------------------     #}
 
 {%- macro information_schema(relation) -%}
