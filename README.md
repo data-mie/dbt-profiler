@@ -1,6 +1,6 @@
 # dbt-profiler
 
-`dbt-profiler` implements dbt macros for profiling database relations and creating  `doc` blocks and table schemas (`schema.yml`) containing said profiles. A calculated profile contains the following measures for each column in a table:
+`dbt-profiler` implements dbt macros for profiling database relations and creating  `doc` blocks and table schemas (`schema.yml`) containing said profiles. A calculated profile contains the following measures for each column in a relation:
 
 * `column_name`: Name of the column
 * `data_type`: Data type of the column
@@ -12,7 +12,7 @@
 * `max`*: Maximum column value
 * `avg`**: Average column value
 * `std_dev_population`**: Population standard deviation
-* `std_dev_sample`: Sample standard deviation
+* `std_dev_sample`**: Sample standard deviation
 * `profiled_at`: Profile calculation date and time
 
 `*` numeric, date and time columns only
