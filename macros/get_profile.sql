@@ -1,4 +1,4 @@
-{% macro get_profile(relation=none) %}
+{% macro get_profile(relation) %}
 
 {% do dbt_profiler.assert_relation_exists(relation) %}
 
