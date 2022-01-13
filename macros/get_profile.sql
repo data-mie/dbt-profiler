@@ -10,6 +10,7 @@
     {% for column_name in column_names %}
       select 
         lower('{{ column_name }}') as column_name,
+        cast(count(*) as numeric) as row_count,
         sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as numeric) as not_null_proportion,
         count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as numeric) as distinct_proportion,
         count(distinct {{ adapter.quote(column_name) }}) as distinct_count,
@@ -28,6 +29,7 @@
   select
     column_profiles.column_name,
     columns.data_type,
+    column_profiles.row_count,
     column_profiles.not_null_proportion,
     column_profiles.distinct_proportion,
     column_profiles.distinct_count,

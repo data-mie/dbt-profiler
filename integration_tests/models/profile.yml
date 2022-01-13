@@ -12,6 +12,10 @@ models:
         tests:
           - not_null
 
+      - name: row_count
+        tests:
+          - not_null
+
       - name: not_null_proportion
         tests:
           - not_null
