@@ -1,6 +1,22 @@
 # dbt-profiler
 
-`dbt-profiler` implements dbt macros for profiling database relations and creating  `doc` blocks and table schemas (`schema.yml`) containing said profiles.
+`dbt-profiler` implements dbt macros for profiling database relations and creating  `doc` blocks and table schemas (`schema.yml`) containing said profiles. A calculated profile contains the following measures for each column in a table:
+
+* `column_name`: Name of the column
+* `data_type`: Data type of the column
+* `not_null_proportion`: Proportion of column values that are not `NULL` (e.g., `0.62` means that 62% of the values are populated while 38% are `NULL`)
+* `distinct_proportion`: Proportion of unique column values (e.g., `1` means that 100% of the values are unique)
+* `distinct_count`: Count of unique column values
+* `is_unique`: True if all column values are unique
+* `min`*: Minimum column value
+* `max`*: Maximum column value
+* `avg`**: Average column value
+* `std_dev_population`**: Population standard deviation
+* `std_dev_sample`: Sample standard deviation
+* `profiled_at`: Profile calculation date and time
+
+`*` numeric, date and time columns only
+`**` numeric columns only
 
 ## Purpose 
 
@@ -23,13 +39,13 @@ An example of the first is implemented in the [print_profile_schema](#print_prof
 # docs/dbt_profiler/customer.md
 {% docs dbt_profiler__customer %}
 
-| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | profiled_at                   |
-| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ----------------------------- |
-| customer_id             | integer   |                1.00 |                1.00 |            100 |      True | 2021-04-28 11:36:59.431462+00 |
-| first_order             | date      |                0.62 |                0.46 |             46 |     False | 2021-04-28 11:36:59.431462+00 |
-| most_recent_order       | date      |                0.62 |                0.52 |             52 |     False | 2021-04-28 11:36:59.431462+00 |
-| number_of_orders        | bigint    |                0.62 |                0.04 |              4 |     False | 2021-04-28 11:36:59.431462+00 |
-| customer_lifetime_value | bigint    |                0.62 |                0.35 |             35 |     False | 2021-04-28 11:36:59.431462+00 |
+| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | min        | max        |                 avg |  std_dev_population |      std_dev_sample | profiled_at                   |
+| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ---------- | ---------- | ------------------- | ------------------- | ------------------- | ----------------------------- |
+| customer_id             | int64     |                1.00 |                1.00 |            100 |         1 | 1          | 100        | 50.5000000000000000 | 28.8660700477221200 | 29.0114919758820200 | 2022-01-13 10:14:48.300040+00 |
+| first_order             | date      |                0.62 |                0.46 |             46 |         0 | 2018-01-01 | 2018-04-07 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
+| most_recent_order       | date      |                0.62 |                0.52 |             52 |         0 | 2018-01-09 | 2018-04-09 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
+| number_of_orders        | int64     |                0.62 |                0.04 |              4 |         0 | 1          | 5          |  1.5967741935483863 |  0.7716692718648833 |  0.7779687173818426 | 2022-01-13 10:14:48.300040+00 |
+| customer_lifetime_value | float64   |                0.62 |                0.35 |             35 |         0 | 1          | 99         | 26.9677419354838830 | 18.6599171435558730 | 18.8122455252636630 | 2022-01-13 10:14:48.300040+00 |
 
 {% enddocs %}
 ```
@@ -164,13 +180,13 @@ dbt run-operation print_profile --args '{"relation_name": "customers"}'
 
 ### Example output
 
-| column_name             | data_type | row_count | not_null_proportion | distinct_proportion | distinct_count | is_unique | min        | max        |                 avg |  std_dev_population |      std_dev_sample | profiled_at                   |
-| ----------------------- | --------- | --------- | ------------------- | ------------------- | -------------- | --------- | ---------- | ---------- | ------------------- | ------------------- | ------------------- | ----------------------------- |
-| customer_lifetime_value | float64   |       100 |                0.62 |                0.35 |             35 |         0 | 1          | 99         | 26.9677419354838830 | 18.6599171435558730 | 18.8122455252636630 | 2022-01-13 10:06:46.270980+00 |
-| customer_id             | int64     |       100 |                1.00 |                1.00 |            100 |         1 | 1          | 100        | 50.5000000000000000 | 28.8660700477221200 | 29.0114919758820200 | 2022-01-13 10:06:46.270980+00 |
-| first_order             | date      |       100 |                0.62 |                0.46 |             46 |         0 | 2018-01-01 | 2018-04-07 |                     |                     |                     | 2022-01-13 10:06:46.270980+00 |
-| number_of_orders        | int64     |       100 |                0.62 |                0.04 |              4 |         0 | 1          | 5          |  1.5967741935483863 |  0.7716692718648833 |  0.7779687173818426 | 2022-01-13 10:06:46.270980+00 |
-| most_recent_order       | date      |       100 |                0.62 |                0.52 |             52 |         0 | 2018-01-09 | 2018-04-09 |                     |                     |                     | 2022-01-13 10:06:46.270980+00 |
+| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | min        | max        |                 avg |  std_dev_population |      std_dev_sample | profiled_at                   |
+| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ---------- | ---------- | ------------------- | ------------------- | ------------------- | ----------------------------- |
+| customer_id             | int64     |                1.00 |                1.00 |            100 |         1 | 1          | 100        | 50.5000000000000000 | 28.8660700477221200 | 29.0114919758820200 | 2022-01-13 10:14:48.300040+00 |
+| first_order             | date      |                0.62 |                0.46 |             46 |         0 | 2018-01-01 | 2018-04-07 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
+| most_recent_order       | date      |                0.62 |                0.52 |             52 |         0 | 2018-01-09 | 2018-04-09 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
+| number_of_orders        | int64     |                0.62 |                0.04 |              4 |         0 | 1          | 5          |  1.5967741935483863 |  0.7716692718648833 |  0.7779687173818426 | 2022-01-13 10:14:48.300040+00 |
+| customer_lifetime_value | float64   |                0.62 |                0.35 |             35 |         0 | 1          | 99         | 26.9677419354838830 | 18.6599171435558730 | 18.8122455252636630 | 2022-01-13 10:14:48.300040+00 |
 
 
 ## print_profile_schema ([source](macros/print_profile_schema.sql))
@@ -199,51 +215,81 @@ models:
 - name: customers
   description: ''
   columns:
+  - name: number_of_orders
+    description: ''
+    meta:
+      data_type: int64
+      row_count: 100.0
+      not_null_proportion: 0.62
+      distinct_proportion: 0.04
+      distinct_count: 4.0
+      is_unique: 0.0
+      min: '1'
+      max: '5'
+      avg: 1.5967741935483863
+      std_dev_population: 0.7716692718648833
+      std_dev_sample: 0.7779687173818426
+      profiled_at: '2022-01-13 10:08:18.446822+00'
+  - name: customer_lifetime_value
+    description: ''
+    meta:
+      data_type: float64
+      row_count: 100.0
+      not_null_proportion: 0.62
+      distinct_proportion: 0.35
+      distinct_count: 35.0
+      is_unique: 0.0
+      min: '1'
+      max: '99'
+      avg: 26.967741935483883
+      std_dev_population: 18.659917143555873
+      std_dev_sample: 18.812245525263663
+      profiled_at: '2022-01-13 10:08:18.446822+00'
   - name: customer_id
     description: ''
     meta:
-      data_type: integer
+      data_type: int64
+      row_count: 100.0
       not_null_proportion: 1.0
       distinct_proportion: 1.0
       distinct_count: 100.0
-      is_unique: true
-      profiled_at: '2021-04-28 11:36:59.431462+00'
+      is_unique: 1.0
+      min: '1'
+      max: '100'
+      avg: 50.5
+      std_dev_population: 28.86607004772212
+      std_dev_sample: 29.01149197588202
+      profiled_at: '2022-01-13 10:08:18.446822+00'
   - name: first_order
     description: ''
     meta:
       data_type: date
+      row_count: 100.0
       not_null_proportion: 0.62
       distinct_proportion: 0.46
       distinct_count: 46.0
-      is_unique: false
-      profiled_at: '2021-04-28 11:36:59.431462+00'
+      is_unique: 0.0
+      min: '2018-01-01'
+      max: '2018-04-07'
+      avg: null
+      std_dev_population: null
+      std_dev_sample: null
+      profiled_at: '2022-01-13 10:08:18.446822+00'
   - name: most_recent_order
     description: ''
     meta:
       data_type: date
+      row_count: 100.0
       not_null_proportion: 0.62
       distinct_proportion: 0.52
       distinct_count: 52.0
-      is_unique: false
-      profiled_at: '2021-04-28 11:36:59.431462+00'
-  - name: number_of_orders
-    description: ''
-    meta:
-      data_type: bigint
-      not_null_proportion: 0.62
-      distinct_proportion: 0.04
-      distinct_count: 4.0
-      is_unique: false
-      profiled_at: '2021-04-28 11:36:59.431462+00'
-  - name: customer_lifetime_value
-    description: ''
-    meta:
-      data_type: bigint
-      not_null_proportion: 0.62
-      distinct_proportion: 0.35
-      distinct_count: 35.0
-      is_unique: false
-      profiled_at: '2021-04-28 11:36:59.431462+00'
+      is_unique: 0.0
+      min: '2018-01-09'
+      max: '2018-04-09'
+      avg: null
+      std_dev_population: null
+      std_dev_sample: null
+      profiled_at: '2022-01-13 10:08:18.446822+00'
 ```
 
 This what the profile looks like on the dbt docs site:
@@ -278,12 +324,12 @@ dbt run-operation print_profile_docs --args '{"relation_name": "customers"}'
 
 ```
 {% docs dbt_profiler__customers  %}
-| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | profiled_at                   |
-| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ----------------------------- |
-| customer_id             | integer   |                1.00 |                1.00 |            100 |      True | 2021-04-28 11:36:59.431462+00 |
-| first_order             | date      |                0.62 |                0.46 |             46 |     False | 2021-04-28 11:36:59.431462+00 |
-| most_recent_order       | date      |                0.62 |                0.52 |             52 |     False | 2021-04-28 11:36:59.431462+00 |
-| number_of_orders        | bigint    |                0.62 |                0.04 |              4 |     False | 2021-04-28 11:36:59.431462+00 |
-| customer_lifetime_value | bigint    |                0.62 |                0.35 |             35 |     False | 2021-04-28 11:36:59.431462+00 |
+| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | min        | max        |                 avg |  std_dev_population |      std_dev_sample | profiled_at                   |
+| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ---------- | ---------- | ------------------- | ------------------- | ------------------- | ----------------------------- |
+| customer_id             | int64     |                1.00 |                1.00 |            100 |         1 | 1          | 100        | 50.5000000000000000 | 28.8660700477221200 | 29.0114919758820200 | 2022-01-13 10:14:48.300040+00 |
+| first_order             | date      |                0.62 |                0.46 |             46 |         0 | 2018-01-01 | 2018-04-07 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
+| most_recent_order       | date      |                0.62 |                0.52 |             52 |         0 | 2018-01-09 | 2018-04-09 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
+| number_of_orders        | int64     |                0.62 |                0.04 |              4 |         0 | 1          | 5          |  1.5967741935483863 |  0.7716692718648833 |  0.7779687173818426 | 2022-01-13 10:14:48.300040+00 |
+| customer_lifetime_value | float64   |                0.62 |                0.35 |             35 |         0 | 1          | 99         | 26.9677419354838830 | 18.6599171435558730 | 18.8122455252636630 | 2022-01-13 10:14:48.300040+00 |
 {% enddocs %}
 ```
