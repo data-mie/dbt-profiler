@@ -63,6 +63,7 @@
   from {{ dbt_profiler.information_schema(relation) }}.COLUMNS
   where lower(table_schema) = lower('{{ relation.schema }}') 
     and lower(table_name) = lower('{{ relation.identifier }}')
+  order by ordinal_position asc
 {%- endmacro -%}
 
 {%- macro redshift__select_from_information_schema_columns(relation) -%}

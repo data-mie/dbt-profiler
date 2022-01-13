@@ -35,7 +35,8 @@
           {% if dbt_profiler.is_numeric_dtype(data_type) %}avg({{ adapter.quote(column_name) }}){% else %}null{% endif %} as avg,
           {% if dbt_profiler.is_numeric_dtype(data_type) %}stddev_pop({{ adapter.quote(column_name) }}){% else %}null{% endif %} as std_dev_population,
           {% if dbt_profiler.is_numeric_dtype(data_type) %}stddev_samp({{ adapter.quote(column_name) }}){% else %}null{% endif %} as std_dev_sample,
-          cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at
+          cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
+          {{ loop.index }} as _column_position
         from {{ relation }}
 
         {% if not loop.last %}union all{% endif %}
@@ -43,8 +44,21 @@
     )
 
     select
-      *
+      column_name,
+      data_type,
+      row_count,
+      not_null_proportion,
+      distinct_proportion,
+      distinct_count,
+      is_unique,
+      min,
+      max,
+      avg,
+      std_dev_population,
+      std_dev_sample,
+      profiled_at
     from column_profiles
+    order by _column_position asc
   {% endset %}
 
   {% do return(profile_sql) %}
