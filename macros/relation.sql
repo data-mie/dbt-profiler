@@ -30,3 +30,9 @@
 {% do return(relation) %}
 
 {% endmacro %}
+
+{% macro assert_relation_exists(relation) %}
+
+{% do run_query("select * from " ~ relation ~ " limit 0") %}
+
+{% endmacro %}

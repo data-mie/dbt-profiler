@@ -13,6 +13,29 @@
 {%- endmacro -%}
 
 
+{# is_numeric_dtype  -------------------------------------------------     #}
+
+{%- macro is_numeric_dtype(dtype) -%}
+  {{ return(adapter.dispatch("is_numeric_dtype", macro_namespace="dbt_profiler")(dtype)) }}
+{%- endmacro -%}
+
+{%- macro default__is_numeric_dtype(dtype) -%}
+  {% set is_numeric = dtype.startswith("int") or dtype.startswith("float") or "numeric" in dtype or "number" in dtype or "double" in dtype %}
+  {% do return(is_numeric) %}
+{%- endmacro -%}
+
+
+{# is_date_or_time_dtype  -------------------------------------------------     #}
+
+{%- macro is_date_or_time_dtype(dtype) -%}
+  {{ return(adapter.dispatch("is_date_or_time_dtype", macro_namespace="dbt_profiler")(dtype)) }}
+{%- endmacro -%}
+
+{%- macro default__is_date_or_time_dtype(dtype) -%}
+  {% set is_date_or_time = dtype.startswith("timestamp") or dtype.startswith("date") %}
+  {% do return(is_date_or_time) %}
+{%- endmacro -%}
+
 {# information_schema  -------------------------------------------------     #}
 
 {%- macro information_schema(relation) -%}
@@ -40,6 +63,7 @@
   from {{ dbt_profiler.information_schema(relation) }}.COLUMNS
   where lower(table_schema) = lower('{{ relation.schema }}') 
     and lower(table_name) = lower('{{ relation.identifier }}')
+  order by ordinal_position asc
 {%- endmacro -%}
 
 {%- macro redshift__select_from_information_schema_columns(relation) -%}
