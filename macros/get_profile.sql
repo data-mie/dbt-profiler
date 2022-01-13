@@ -31,7 +31,9 @@
         count(distinct {{ adapter.quote(column_name) }}) = count(*) as is_unique,
         {% if dbt_profiler.is_numeric_dtype(data_type) %}min({{ adapter.quote(column_name) }}){% else %}null{% endif %} as min,
         {% if dbt_profiler.is_numeric_dtype(data_type) %}max({{ adapter.quote(column_name) }}){% else %}null{% endif %} as max,
-        {% if dbt_profiler.is_numeric_dtype(data_type) %}avg({{ adapter.quote(column_name) }}){% else %}null{% endif %} as average,
+        {% if dbt_profiler.is_numeric_dtype(data_type) %}avg({{ adapter.quote(column_name) }}){% else %}null{% endif %} as avg,
+        {% if dbt_profiler.is_numeric_dtype(data_type) %}stddev_pop({{ adapter.quote(column_name) }}){% else %}null{% endif %} as std_dev_population,
+        {% if dbt_profiler.is_numeric_dtype(data_type) %}stddev_samp({{ adapter.quote(column_name) }}){% else %}null{% endif %} as std_dev_sample,
         cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at
       from {{ relation }}
 

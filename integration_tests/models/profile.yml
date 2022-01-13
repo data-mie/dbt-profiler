@@ -35,7 +35,7 @@ models:
               quote: false
               values: ["TRUE", "FALSE"]
 
-      - name: average
+      - name: avg
         tests:
           - not_null:
               where: &column_is_numeric column_name not like 'string%'
@@ -46,6 +46,16 @@ models:
               where: *column_is_numeric
 
       - name: max
+        tests:
+          - not_null:
+              where: *column_is_numeric
+
+      - name: std_dev_population
+        tests:
+          - not_null:
+              where: *column_is_numeric
+
+      - name: std_dev_sample
         tests:
           - not_null:
               where: *column_is_numeric
