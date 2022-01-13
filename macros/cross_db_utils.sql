@@ -13,6 +13,17 @@
 {%- endmacro -%}
 
 
+{# is_numeric_dtype  -------------------------------------------------     #}
+
+{%- macro is_numeric_dtype(dtype) -%}
+  {{ return(adapter.dispatch("is_numeric_dtype", macro_namespace="dbt_profiler")(dtype)) }}
+{%- endmacro -%}
+
+{%- macro default__is_numeric_dtype(dtype) -%}
+  {% set is_numeric = "int" in dtype or "float" in dtype or "numeric" in dtype or "number" in dtype %}
+  {% do return(is_numeric) %}
+{%- endmacro -%}
+
 {# information_schema  -------------------------------------------------     #}
 
 {%- macro information_schema(relation) -%}
