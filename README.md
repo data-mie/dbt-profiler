@@ -333,3 +333,12 @@ dbt run-operation print_profile_docs --args '{"relation_name": "customers"}'
 | customer_lifetime_value | float64   |                0.62 |                0.35 |             35 |         0 | 1          | 99         | 26.9677419354838830 | 18.6599171435558730 | 18.8122455252636630 | 2022-01-13 10:14:48.300040+00 |
 {% enddocs %}
 ```
+
+### Contributions
+
+#### Added date type to tests, fix #37 Error when profiling integer after date after string columns
+
+Profiling a table whose column are integer, date, string in this order raises the following error :
+ERROR:  UNION types text and numeric cannot be matched
+LINE 60:           avg("int_after_date_after_string") as avg,
+Appropriately casting the null default value solves it.
