@@ -1,4 +1,4 @@
-{% macro get_relation(relation=none, relation_name=none, schema=none, database=none) %}
+{% macro get_relation(relation=none, relation_name=none, schema=none, database=none, exclude_metrics=none) %}
 
 {% if relation is none and relation_name is none %}
   {{ exceptions.raise_compiler_error("Either relation or relation_name must be specified.") }}
@@ -26,8 +26,9 @@
     {{ exceptions.raise_compiler_error("Relation " ~ adapter.quote(relation_name) ~ " does not exist or not authorized.") }}
   {% endif %}
 {% endif %}
+{% set relation_res = {'relation':relation, 'exclude_metrics':exclude_metrics} %}
 
-{% do return(relation) %}
+{% do return(relation_res) %}
 
 {% endmacro %}
 
