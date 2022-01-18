@@ -149,7 +149,7 @@ This macro returns a relation profile as an [agate.Table](https://agate.readthed
 * `relation_name` (either `relation` or `relation_name` is required): Relation name
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
-* `exclude_metrics` (optional): List of columns that should not be computed for the aggregates: avg, std_dev_population and std_dev_sample.
+* `exclude_metrics` (optional): List of columns that should not be computed for the aggregates: avg, std_dev_population and std_dev_sample (ie, `"exclude_metrics:[index, primary_key]"`).
 
 ### Usage
 
@@ -309,6 +309,7 @@ This macro prints a relation profile as a Markdown table wrapped in a Jinja `doc
 * `relation_name` (either `relation` or `relation_name` is required): Relation name
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
+* `exclude_metrics` (optional): List of columns that should not be computed for the aggregates: avg, std_dev_population and std_dev_sample (ie, `"exclude_metrics:[index, primary_key]"`).
 * `docs_name` (optional): `docs` macro name (default: `dbt_profiler__{{ relation_name }}`)
 * `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
