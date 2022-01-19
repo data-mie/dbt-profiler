@@ -336,7 +336,7 @@ dbt run-operation print_profile_docs --args '{"relation_name": "customers"}'
 
 ### Contributions
 
-#### Added date type to tests, fix #37 Error when profiling integer after date after string columns
+#### [mdutoo](https://github.com/mdutoo): Added date type to tests, fix [#37](https://github.com/data-mie/dbt-profiler/issues/37) Error when profiling integer after date after string columns
 
 Profiling a table whose column are integer, date, string in this order raises the following error :
 ERROR:  UNION types text and numeric cannot be matched
