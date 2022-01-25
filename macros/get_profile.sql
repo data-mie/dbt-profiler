@@ -2,8 +2,7 @@
 
 {% if execute %}
 
-  {% do dbt_profiler.assert_relation_exists(relation) %}
-
+  {% do dbt_profiler.assert_relation_exists(relation) %}  
   {{ log("Get columns in relation %s" | format(relation.include()), info=False) }}
   {%- set columns = adapter.get_columns_in_relation(relation) -%}
   {%- set column_names = columns | map(attribute="name") | list -%}
@@ -18,7 +17,7 @@
     {% do data_type_map.update({column_name: information_schema_data_types[loop.index-1]}) %}
   {% endfor %}
   {{ log("Column data types: " ~ data_type_map, info=False) }}
-
+  {% set exclude_columns = exclude_columns | map('lower') | list %}
   {% set profile_sql %}
     with column_profiles as (
       {% for column_name in column_names %}
