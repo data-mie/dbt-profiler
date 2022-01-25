@@ -1,6 +1,7 @@
-{% macro get_profile(relation, exclude_metrics) %}
+{% macro get_profile(relation, exclude_columns) %}
 
 {% if execute %}
+
   {% do dbt_profiler.assert_relation_exists(relation) %}
 
   {{ log("Get columns in relation %s" | format(relation.include()), info=False) }}
@@ -18,14 +19,11 @@
   {% endfor %}
   {{ log("Column data types: " ~ data_type_map, info=False) }}
 
-  {% set column_name_rep = dbt_utils.replace(column_name,"'","")%}
-  {% set exclude_metrics = exclude_metrics | map('lower') | list %}
   {% set profile_sql %}
     with column_profiles as (
       {% for column_name in column_names %}
         {% set data_type = data_type_map.get(column_name.lower(), "") %}
-
-        select 
+                select 
           lower('{{ column_name }}') as column_name,
           nullif(lower('{{ data_type }}'), '') as data_type,
           cast(count(*) as numeric) as row_count,
@@ -35,7 +33,7 @@
           count(distinct {{ adapter.quote(column_name) }}) = count(*) as is_unique,
           {% if dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type) %}cast(min({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }}){% else %}null{% endif %} as min,
           {% if dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type) %}cast(max({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }}){% else %}null{% endif %} as max,
-          {% if column_name.lower() in exclude_metrics %}
+          {% if column_name.lower() in exclude_columns %}
             NULL as avg,
             NULL as std_dev_population,
             NULL as std_dev_sample,
@@ -50,8 +48,8 @@
 
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
-    )
 
+    )
     select
       column_name,
       data_type,
