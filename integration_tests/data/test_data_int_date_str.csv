@@ -1,0 +1,6 @@
+id,date_nullable,string_nullable
+1,2022-01-01,one
+2,2022-01-01,two
+3,,three
+4,,
+5,2022-01-01,
