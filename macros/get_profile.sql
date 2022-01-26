@@ -22,7 +22,7 @@
     with column_profiles as (
       {% for column_name in column_names %}
         {% set data_type = data_type_map.get(column_name.lower(), "") %}
-                select 
+        select 
           lower('{{ column_name }}') as column_name,
           nullif(lower('{{ data_type }}'), '') as data_type,
           cast(count(*) as numeric) as row_count,
