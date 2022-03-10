@@ -4,19 +4,20 @@
 
 * `column_name`: Name of the column
 * `data_type`: Data type of the column
-* `not_null_proportion`: Proportion of column values that are not `NULL` (e.g., `0.62` means that 62% of the values are populated while 38% are `NULL`)
-* `distinct_proportion`: Proportion of unique column values (e.g., `1` means that 100% of the values are unique)
-* `distinct_count`: Count of unique column values
-* `is_unique`: True if all column values are unique
-* `min`*: Minimum column value
-* `max`*: Maximum column value
-* `avg`**: Average column value
-* `std_dev_population`**: Population standard deviation
-* `std_dev_sample`**: Sample standard deviation
+* `not_null_proportion`^: Proportion of column values that are not `NULL` (e.g., `0.62` means that 62% of the values are populated while 38% are `NULL`)
+* `distinct_proportion`^: Proportion of unique column values (e.g., `1` means that 100% of the values are unique)
+* `distinct_count`^: Count of unique column values
+* `is_unique`^: True if all column values are unique
+* `min`*^: Minimum column value
+* `max`*^: Maximum column value
+* `avg`**^: Average column value
+* `std_dev_population`**^: Population standard deviation
+* `std_dev_sample`**^: Sample standard deviation
 * `profiled_at`: Profile calculation date and time
 
 `*` numeric, date and time columns only
 `**` numeric columns only
+`^` can be excluded from the profile using `exclude_measures` argument
 
 ## Purpose 
 
@@ -116,6 +117,7 @@ This macro returns a relation profile as a SQL query that can be used in a dbt m
 
 ### Arguments
 * `relation` (required): [Relation](https://docs.getdbt.com/reference/dbt-classes#relation) object
+* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
 
 ### Usage
 
@@ -128,7 +130,7 @@ Use this macro in a dbt model, using a [ref()](https://docs.getdbt.com/reference
 Use this macro in a dbt model, using a [source()](https://docs.getdbt.com/reference/dbt-jinja-functions/source):
 
 ```sql
-{{ dbt_profiler.get_profile(relation=source("jaffle_shop","customers")) }}
+{{ dbt_profiler.get_profile(relation=source("jaffle_shop","customers"), exclude_measures=["std_dev_population", "std_dev_sample"]) }}
 ```
 
 To configure the macro to be called only when dbt is in [execute](https://docs.getdbt.com/reference/dbt-jinja-functions/execute) mode:
@@ -149,6 +151,7 @@ This macro returns a relation profile as an [agate.Table](https://agate.readthed
 * `relation_name` (either `relation` or `relation_name` is required): Relation name
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
+* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
 
 ### Usage
 
@@ -167,6 +170,7 @@ This macro prints a relation profile as a Markdown table to `stdout`.
 * `relation_name` (either `relation` or `relation_name` is required): Relation name
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
+* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
 * `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
 * `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
@@ -198,6 +202,7 @@ This macro prints a relation schema YAML to `stdout` containing all columns and 
 * `relation_name` (either `relation` or `relation_name` is required): Relation name
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
+* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
 * `model_description` (optional): Model description included in the schema (default: `""`)
 * `column_description` (optional): Column descriptions included in the schema (default: `""`)
 
@@ -307,6 +312,7 @@ This macro prints a relation profile as a Markdown table wrapped in a Jinja `doc
 * `relation_name` (either `relation` or `relation_name` is required): Relation name
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
+* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
 * `docs_name` (optional): `docs` macro name (default: `dbt_profiler__{{ relation_name }}`)
 * `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
