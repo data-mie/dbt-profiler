@@ -47,7 +47,7 @@
 {%- endmacro -%}
 
 {%- macro bigquery__information_schema(relation) -%}
-  {{ adapter.quote(relation.schema) }}.INFORMATION_SCHEMA
+  {{ adapter.quote(relation.database) }}.{{ adapter.quote(relation.schema) }}.INFORMATION_SCHEMA
 {%- endmacro -%}
 
 
