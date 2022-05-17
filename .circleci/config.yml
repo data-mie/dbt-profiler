@@ -66,8 +66,11 @@ jobs:
       DBT_PROFILES_DIR: ./
       BIGQUERY_KEYFILE: ./bigquery-service-key.json
 
+    working_directory: ~/repo/integration_tests
+
     steps:
-      - checkout
+      - checkout:
+          path: ~/repo
       - run:
           name: Install dependencies
           command: |
