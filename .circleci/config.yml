@@ -18,10 +18,11 @@ jobs:
       INTEGRATION_TEST_SCHEMA: dbt_profiler_integration_tests_postgres
       POSTGRES_HOST: postgres
 
-    working_directory: ~/integration_tests
+    working_directory: ~/repo/integration_tests
 
     steps:
-      - checkout
+      - checkout:
+          path: ~/repo
       - run:
           name: Install dependencies
           command: |
