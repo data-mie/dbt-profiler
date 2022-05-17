@@ -1,4 +1,8 @@
-{% macro get_profile(relation, exclude_measures=[]) %}
+{% macro get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[]) %}
+
+{%- if include_columns and exclude_columns -%}
+    {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
+{%- endif -%}
 
 {%- set all_measures = [
   "row_count",
@@ -21,9 +25,19 @@
   {% do dbt_profiler.assert_relation_exists(relation) %}
 
   {{ log("Get columns in relation %s" | format(relation.include()), info=False) }}
-  {%- set columns = adapter.get_columns_in_relation(relation) -%}
-  {%- set column_names = columns | map(attribute="name") | list -%}
-  {{ log("Columns: " ~ column_names | join(', '), info=False) }}
+  {%- set relation_columns = adapter.get_columns_in_relation(relation) -%}
+  {%- set relation_column_names = relation_columns | map(attribute="name") | list -%}
+  {{ log("Relation columns: " ~ relation_column_names | join(', '), info=False) }}
+
+  {%- if include_columns -%}
+    {%- set profile_column_names = relation_column_names | select("in", include_columns) | list-%}
+  {%- elif exclude_columns -%}
+    {%- set profile_column_names = relation_column_names | reject("in", exclude_columns) | list -%}
+  {%- else -%}
+    {%- set profile_column_names = relation_column_names -%}
+  {%- endif -%}
+
+  {{ log("Profile columns: " ~ profile_column_names | join(', '), info=False) }}
 
   {% set information_schema_columns = run_query(dbt_profiler.select_from_information_schema_columns(relation)) %}
   {% set information_schema_columns = information_schema_columns.rename(information_schema_columns.column_names | map('lower')) %}
@@ -36,8 +50,14 @@
   {{ log("Column data types: " ~ data_type_map, info=False) }}
 
   {% set profile_sql %}
-    with column_profiles as (
-      {% for column_name in column_names %}
+    with source_data as (
+      select
+        *
+      from {{ relation }}
+    ),
+
+    column_profiles as (
+      {% for column_name in profile_column_names %}
         {% set data_type = data_type_map.get(column_name.lower(), "") %}
         select 
           lower('{{ column_name }}') as column_name,
@@ -74,7 +94,7 @@
           {%- endif %}
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
-        from {{ relation }}
+        from source_data
 
         {% if not loop.last %}union all{% endif %}
       {% endfor %}

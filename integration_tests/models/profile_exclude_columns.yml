@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: profile_exclude_columns
+    columns:
+      - name: column_name
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_in_set:
+              value_set: ["numeric_not_nullable"]

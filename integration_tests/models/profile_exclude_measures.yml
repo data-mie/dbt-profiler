@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: profile_exclude_measures
+    tests:
+      - dbt_expectations.expect_table_columns_to_not_contain_set:
+          column_list: ["avg", "std_dev_population", "std_dev_sample"]
+          transform: lower
