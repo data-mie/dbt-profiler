@@ -33,8 +33,6 @@ jobs:
       - run:
           name: Run tests
           command: |
-            pwd
-            ls -la
             dbt seed --target postgres
             dbt run --target postgres
             dbt test --target postgres
@@ -66,8 +64,6 @@ jobs:
 
     environment:
       DBT_PROFILES_DIR: ./
-      BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
-      BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
       BIGQUERY_KEYFILE: ./bigquery-service-key.json
 
     steps:
@@ -78,6 +74,19 @@ jobs:
             pip install dbt-bigquery
             dbt deps
             dbt --version
+
+      - run:
+          name: Test database connection
+          command: |
+            echo "${BIGQUERY_SERVICE_ACCOUNT_JSON}" > ${BIGQUERY_KEYFILE}
+            dbt debug --target bigquery
+
+      - run:
+          name: Run tests
+          command: |
+            dbt seed --target bigquery
+            dbt run --target bigquery
+            dbt test --target bigquery
 
 workflows:
   version: 2
