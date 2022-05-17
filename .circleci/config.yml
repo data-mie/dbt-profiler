@@ -1,0 +1,103 @@
+version: 2.1
+
+jobs:
+  integration-postgres:
+    docker:
+      - image: cimg/python:3.9.9
+      - image: cimg/postgres:14.0
+        environment:
+          POSTGRES_USER: dbt
+          POSTGRES_PASSWORD: dbt
+          POSTGRES_DB: dbt
+
+    resource_class: small
+
+    environment:
+      DBT_PROFILES_DIR: ./
+      INTEGRATION_TEST_RELATION: test_data
+      INTEGRATION_TEST_SCHEMA: dbt_profiler_integration_tests_postgres
+      POSTGRES_HOST: localhost
+
+    working_directory: ~/repo/integration_tests
+
+    steps:
+      - checkout:
+          path: ~/repo
+      - run:
+          name: Install dependencies
+          command: |
+            pip install dbt-postgres
+            dbt deps
+            dbt --version
+
+      - run:
+          name: Run tests
+          command: |
+            dbt seed --target postgres
+            dbt run --target postgres
+            dbt test --target postgres
+
+      - run:
+          name: Run print_profile macro
+          command: |
+            dbt run-operation print_profile --args '{"relation_name": "'$INTEGRATION_TEST_RELATION'", "schema": "'$INTEGRATION_TEST_SCHEMA'"}'
+
+      - run:
+          name: Run print_profile_schema macro
+          command: |
+            dbt run-operation print_profile_schema --args '{"relation_name": "'$INTEGRATION_TEST_RELATION'", "schema": "'$INTEGRATION_TEST_SCHEMA'"}'
+
+      - run:
+          name: Run print_profile_docs macro
+          command: |
+            dbt run-operation print_profile_docs --args '{"relation_name": "'$INTEGRATION_TEST_RELATION'", "schema": "'$INTEGRATION_TEST_SCHEMA'"}'
+
+      - run:
+          name: Run update-relation-profile.sh script
+          command: ../update-relation-profile.sh $INTEGRATION_TEST_RELATION $INTEGRATION_TEST_SCHEMA
+
+  integration-bigquery:
+    docker:
+      - image: cimg/python:3.9.9
+
+    resource_class: small
+
+    environment:
+      DBT_PROFILES_DIR: ./
+      BIGQUERY_KEYFILE: ./bigquery-service-key.json
+
+    working_directory: ~/repo/integration_tests
+
+    steps:
+      - checkout:
+          path: ~/repo
+      - run:
+          name: Install dependencies
+          command: |
+            pip install dbt-bigquery
+            dbt deps
+            dbt --version
+
+      - run:
+          name: Test database connection
+          command: |
+            echo "${BIGQUERY_SERVICE_ACCOUNT_JSON}" > ${BIGQUERY_KEYFILE}
+            dbt debug --target bigquery
+
+      - run:
+          name: Run tests
+          command: |
+            dbt seed --target bigquery
+            dbt run --target bigquery
+            dbt test --target bigquery
+
+workflows:
+  version: 2
+  continuous-integration:
+    jobs:
+      - integration-postgres
+      - approve:
+          type: approval
+      - integration-bigquery:
+          requires:
+            - approve
