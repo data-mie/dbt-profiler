@@ -50,13 +50,7 @@
   {{ log("Column data types: " ~ data_type_map, info=False) }}
 
   {% set profile_sql %}
-    with source_data as (
-      select
-        *
-      from {{ relation }}
-    ),
-
-    column_profiles as (
+    with column_profiles as (
       {% for column_name in profile_column_names %}
         {% set data_type = data_type_map.get(column_name.lower(), "") %}
         select 
@@ -94,7 +88,7 @@
           {%- endif %}
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
-        from source_data
+        from {{ relation }}
 
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
