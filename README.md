@@ -120,6 +120,8 @@ This macro returns a relation profile as a SQL query that can be used in a dbt m
 ### Arguments
 * `relation` (required): [Relation](https://docs.getdbt.com/reference/dbt-classes#relation) object
 * `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
+* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
+* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 
 ### Usage
 
@@ -154,6 +156,8 @@ This macro returns a relation profile as an [agate.Table](https://agate.readthed
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
 * `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
+* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
+* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 
 ### Usage
 
@@ -173,6 +177,8 @@ This macro prints a relation profile as a Markdown table to `stdout`.
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
 * `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
+* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
+* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 * `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
 * `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
@@ -205,6 +211,8 @@ This macro prints a relation schema YAML to `stdout` containing all columns and 
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
 * `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
+* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
+* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 * `model_description` (optional): Model description included in the schema (default: `""`)
 * `column_description` (optional): Column descriptions included in the schema (default: `""`)
 
@@ -315,6 +323,8 @@ This macro prints a relation profile as a Markdown table wrapped in a Jinja `doc
 * `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
 * `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
 * `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
+* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
+* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 * `docs_name` (optional): `docs` macro name (default: `dbt_profiler__{{ relation_name }}`)
 * `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
