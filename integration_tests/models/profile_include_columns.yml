@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: profile_include_columns
+    columns:
+      - name: column_name
+        tests:
+          - accepted_values:
+              values: ["numeric_not_nullable"]
