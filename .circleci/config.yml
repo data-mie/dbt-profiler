@@ -27,6 +27,32 @@ jobs:
             dbt deps
             dbt --version
 
+      - run:
+          name: Run tests
+          command: |
+            dbt seed --target postgres
+            dbt run --target postgres
+            dbt test --target postgres
+
+      - run:
+          name: Run print_profile macro
+          command: |
+            dbt run-operation print_profile --args '{"relation_name": "'$INTEGRATION_TEST_RELATION'", "schema": "'$INTEGRATION_TEST_SCHEMA'"}'
+
+      - run:
+          name: Run print_profile_schema macro
+          command: |
+            dbt run-operation print_profile_schema --args '{"relation_name": "'$INTEGRATION_TEST_RELATION'", "schema": "'$INTEGRATION_TEST_SCHEMA'"}'
+
+      - run:
+          name: Run print_profile_docs macro
+          command: |
+            dbt run-operation print_profile_docs --args '{"relation_name": "'$INTEGRATION_TEST_RELATION'", "schema": "'$INTEGRATION_TEST_SCHEMA'"}'
+
+      - run:
+          name: Run update-relation-profile.sh script
+          command: ../update-relation-profile.sh $INTEGRATION_TEST_RELATION $INTEGRATION_TEST_SCHEMA
+
   integration-bigquery:
     docker:
       - image: cimg/python:3.9.9
