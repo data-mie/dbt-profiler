@@ -32,6 +32,8 @@ jobs:
       - run:
           name: Run tests
           command: |
+            pwd
+            ls -la
             dbt seed --target postgres
             dbt run --target postgres
             dbt test --target postgres
