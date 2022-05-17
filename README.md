@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/data-mie/dbt-profiler/tree/main.svg?style=svg)](https://circleci.com/gh/data-mie/dbt-profiler/tree/main)
+
 # dbt-profiler
 
 `dbt-profiler` implements dbt macros for profiling database relations and creating  `doc` blocks and table schemas (`schema.yml`) containing said profiles. A calculated profile contains the following measures for each column in a relation:
