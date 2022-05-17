@@ -18,6 +18,8 @@ jobs:
       INTEGRATION_TEST_SCHEMA: dbt_profiler_integration_tests_postgres
       POSTGRES_HOST: postgres
 
+    working_directory: ~/integration_tests
+
     steps:
       - checkout
       - run:
