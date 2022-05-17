@@ -16,7 +16,7 @@ jobs:
       DBT_PROFILES_DIR: ./
       INTEGRATION_TEST_RELATION: test_data
       INTEGRATION_TEST_SCHEMA: dbt_profiler_integration_tests_postgres
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: localhost
 
     working_directory: ~/repo/integration_tests
 
