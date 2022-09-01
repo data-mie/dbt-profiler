@@ -97,9 +97,9 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 
 ✅ Redshift
 
-❌ Apache Spark
+✅ Databricks
 
-❌ Databricks
+❌ Apache Spark
 
 ❌ Presto
 
