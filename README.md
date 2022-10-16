@@ -99,6 +99,8 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 
 ✅ Databricks
 
+✅ SQL Server
+
 ❌ Apache Spark
 
 ❌ Presto
