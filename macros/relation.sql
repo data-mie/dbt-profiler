@@ -31,8 +31,18 @@
 
 {% endmacro %}
 
-{% macro assert_relation_exists(relation) %}
+{%- macro assert_relation_exists(relation) -%}
+  {{ return(adapter.dispatch("assert_relation_exists", macro_namespace="dbt_profiler")(relation)) }}
+{%- endmacro -%}
+
+{% macro default__assert_relation_exists(relation) %}
 
 {% do run_query("select * from " ~ relation ~ " limit 0") %}
+
+{% endmacro %}
+
+{% macro sqlserver__assert_relation_exists(relation) %}
+
+{% do run_query("select top(0) * from " ~ relation ~ "") %}
 
 {% endmacro %}

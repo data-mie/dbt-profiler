@@ -28,6 +28,11 @@
   {% do return(is_numeric) %}
 {%- endmacro -%}
 
+{%- macro sqlserver__is_numeric_dtype(dtype) -%}
+  {% set is_numeric = dtype in ["decimal", "numeric", "bigint" "numeric", "bit", "smallint", "decimal", "int", "tinyint", "money", "float", "real"]  %}
+  {% do return(is_numeric) %}
+{%- endmacro -%}
+
 
 {# is_date_or_time_dtype  -------------------------------------------------     #}
 
