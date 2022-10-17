@@ -353,7 +353,7 @@
       {% endfor %}
     )
 
-    select
+    select top 100 percent
       column_name,
       data_type,
       {% for measure in include_measures %}
