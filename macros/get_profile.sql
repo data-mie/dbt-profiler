@@ -1,10 +1,10 @@
-{% macro get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[]) %}
-  {{ return(adapter.dispatch("get_profile", macro_namespace="dbt_profiler")(relation, exclude_measures, include_columns, exclude_columns)) }}
+{% macro get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none) %}
+  {{ return(adapter.dispatch("get_profile", macro_namespace="dbt_profiler")(relation, exclude_measures, include_columns, exclude_columns, where_clause)) }}
 {% endmacro %}
 
 
 
-{% macro default__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[]) %}
+{% macro default__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -36,7 +36,7 @@
   {{ log("Relation columns: " ~ relation_column_names | join(', '), info=False) }}
 
   {%- if include_columns -%}
-    {%- set profile_column_names = relation_column_names | select("in", include_columns) | list-%}
+    {%- set profile_column_names = relation_column_names | select("in", include_columns) | list -%}
   {%- elif exclude_columns -%}
     {%- set profile_column_names = relation_column_names | reject("in", exclude_columns) | list -%}
   {%- else -%}
@@ -101,6 +101,9 @@
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
+        {% if where_clause %}
+        where {{ where_clause }}
+        {% endif %}
 
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
@@ -124,7 +127,7 @@
 
 
 
-{% macro databricks__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[]) %}
+{% macro databricks__get_profile(relation, exclude_measures=[], include_columns=[], where_clause=none) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -156,7 +159,7 @@
   {{ log("Relation columns: " ~ relation_column_names | join(', '), info=False) }}
 
   {%- if include_columns -%}
-    {%- set profile_column_names = relation_column_names | select("in", include_columns) | list-%}
+    {%- set profile_column_names = relation_column_names | select("in", include_columns) | list -%}
   {%- elif exclude_columns -%}
     {%- set profile_column_names = relation_column_names | reject("in", exclude_columns) | list -%}
   {%- else -%}
@@ -226,7 +229,9 @@
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
-
+        {% if where_clause %}
+        where {{ where_clause }}
+        {% endif %}
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
     )
@@ -251,7 +256,7 @@
 
 
 
-{% macro sqlserver__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[]) %}
+{% macro sqlserver__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -283,7 +288,7 @@
   {{ log("Relation columns: " ~ relation_column_names | join(', '), info=False) }}
 
   {%- if include_columns -%}
-    {%- set profile_column_names = relation_column_names | select("in", include_columns) | list-%}
+    {%- set profile_column_names = relation_column_names | select("in", include_columns) | list -%}
   {%- elif exclude_columns -%}
     {%- set profile_column_names = relation_column_names | reject("in", exclude_columns) | list -%}
   {%- else -%}
@@ -348,6 +353,9 @@
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
+        {% if where_clause %}
+        where {{ where_clause }}
+        {% endif %}
 
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
