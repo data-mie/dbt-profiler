@@ -127,7 +127,7 @@
 
 
 
-{% macro databricks__get_profile(relation, exclude_measures=[], include_columns=[], where_clause=none) %}
+{% macro databricks__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
