@@ -3,7 +3,7 @@ version: 2
 models:
   - name: profile_where_clause
     columns:
-      - name: string_not_nullable
+      - name: row_count
         tests:
-          - dbt_expectations.expect_column_values_to_match_like_pattern:
-              like_pattern: ["one"]
+          - dbt_utils.expression_is_true:
+              expression: "= 2"
