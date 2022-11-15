@@ -60,6 +60,9 @@
       select
         *
       from {{ relation }}
+      {% if where_clause %}
+        where {{ where_clause }}
+      {% endif %}
     ),
 
     column_profiles as (
@@ -101,9 +104,6 @@
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
-        {% if where_clause %}
-        where {{ where_clause }}
-        {% endif %}
 
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
@@ -188,6 +188,9 @@
       select
         *
       from {{ relation }}
+      {% if where_clause %}
+        where {{ where_clause }}
+      {% endif %}
     ),
 
     column_profiles as (
@@ -229,9 +232,6 @@
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
-        {% if where_clause %}
-        where {{ where_clause }}
-        {% endif %}
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
     )
@@ -312,6 +312,9 @@
       select
         *
       from {{ relation }}
+      {% if where_clause %}
+        where {{ where_clause }}
+      {% endif %}
     ),
 
     column_profiles as (
@@ -353,9 +356,6 @@
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
-        {% if where_clause %}
-        where {{ where_clause }}
-        {% endif %}
 
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
