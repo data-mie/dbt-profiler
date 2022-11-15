@@ -124,13 +124,14 @@ This macro returns a relation profile as a SQL query that can be used in a dbt m
 * `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
 * `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 * `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
+* `where_clause` (optional): SQL `WHERE` clause to allow exclustion of records from profiler.
 
 ### Usage
 
 Use this macro in a dbt model, using a [ref()](https://docs.getdbt.com/reference/dbt-jinja-functions/ref):
 
 ```sql
-{{ dbt_profiler.get_profile(relation=ref("customers")) }}
+{{ dbt_profiler.get_profile(relation=ref("customers"), where_clause="is_active = true") }}
 ```
 
 Use this macro in a dbt model, using a [source()](https://docs.getdbt.com/reference/dbt-jinja-functions/source):
@@ -160,6 +161,7 @@ This macro returns a relation profile as an [agate.Table](https://agate.readthed
 * `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
 * `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 * `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
+* `where_clause` (optional): SQL where clause to allow exclustion of records from profiler.  This is done after the `WHERE` keyword.
 
 ### Usage
 
@@ -187,6 +189,7 @@ This macro prints a relation profile as a Markdown table to `stdout`.
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
 * `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
 * `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: `none` i.e., not limited)
+* `where_clause` (optional): SQL where clause to allow exclustion of records from profiler.  This is done after the `WHERE` keyword.
 
 ### Usage
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
@@ -228,6 +231,7 @@ This macro prints a relation schema YAML to `stdout` containing all columns and 
 * `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 * `model_description` (optional): Model description included in the schema (default: `""`)
 * `column_description` (optional): Column descriptions included in the schema (default: `""`)
+* `where_clause` (optional): SQL where clause to allow exclustion of records from profiler.  This is done after the `WHERE` keyword.
 
 ### Usage
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
@@ -345,6 +349,7 @@ This macro prints a relation profile as a Markdown table wrapped in a Jinja `doc
 * `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
 * `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
 * `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: `none` i.e., not limited)
+* `where_clause` (optional): SQL where clause to allow exclustion of records from profiler.  This is done after the `WHERE` keyword.
 
 
 ### Usage
