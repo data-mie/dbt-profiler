@@ -10,5 +10,6 @@ Describe your changes, and why you're making them.
     - [ ] Snowflake
     - [ ] Redshift
     - [ ] SQL Server
+    - [ ] Databricks
 - [ ] I have written tests for new macros (either as dbt schema tests in `integration_tests/models`, dbt data tests in `integration_tests/tests` or integration tests in the [CI workflow](workflows/main.yml))
 - [ ] I have updated the README.md (if applicable)
