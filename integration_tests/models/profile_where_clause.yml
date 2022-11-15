@@ -1,9 +1,9 @@
 version: 2
 
 models:
-  - name: profile_exclude_columns
+  - name: profile_where_clause
     columns:
       - name: string_not_nullable
         tests:
           - dbt_expectations.expect_column_values_to_match_like_pattern:
-              like_patter: ["one"]
+              like_pattern: ["one"]
