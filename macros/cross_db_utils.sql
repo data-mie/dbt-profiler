@@ -34,6 +34,23 @@
 {%- endmacro -%}
 
 
+{# is_bool_dtype  -------------------------------------------------     #}
+
+{%- macro is_bool_dtype(dtype) -%}
+  {{ return(adapter.dispatch("is_bool_dtype", macro_namespace="dbt_profiler")(dtype)) }}
+{%- endmacro -%}
+
+{%- macro default__is_bool_dtype(dtype) -%}
+  {% set is_bool = dtype.startswith("bool") %}
+  {% do return(is_bool) %}
+{%- endmacro -%}
+
+{%- macro sqlserver__is_numeric_dtype(dtype) -%}
+  {% set is_numeric = dtype in ["decimal", "numeric", "bigint" "numeric", "smallint", "decimal", "int", "tinyint", "money", "float", "real"]  %}
+  {% do return(is_numeric) %}
+{%- endmacro -%}
+
+
 {# is_date_or_time_dtype  -------------------------------------------------     #}
 
 {%- macro is_date_or_time_dtype(dtype) -%}

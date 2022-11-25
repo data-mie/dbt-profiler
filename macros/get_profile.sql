@@ -93,7 +93,13 @@
             {% if dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type) %}cast(max({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }}){% else %}null{% endif %} as max,
           {%- endif %}
           {% if "avg" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}avg({{ adapter.quote(column_name) }}){% else %}cast(null as numeric){% endif %} as avg,
+            {% if dbt_profiler.is_numeric_dtype(data_type) %}
+                avg({{ adapter.quote(column_name) }})
+            {% elif dbt_profiler.is_numeric_dtype(data_type) %}
+                avg(case when {{ adapter.quote(column_name) }} then 1 else 0 end)
+            {% else %}
+                cast(null as numeric)
+            {% endif %} as avg,
           {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
             {% if dbt_profiler.is_numeric_dtype(data_type) %}stddev_pop({{ adapter.quote(column_name) }}){% else %}cast(null as numeric){% endif %} as std_dev_population,
