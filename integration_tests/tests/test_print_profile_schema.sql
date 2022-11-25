@@ -12,7 +12,7 @@
     and actual_model_count == 1 
     and actual_relation_name == "test_data" 
     and actual_description == ""
-    and actual_column_count == 6
+    and actual_column_count == 7
   %}
   {% if not is_pass %}
     select 'fail'
