@@ -7,9 +7,9 @@
 {% endif %}
 
 {% if execute %}
-  {{ log('{% docs ' + docs_name + '  %}', info=True) }}
+  {{ print('{% docs ' + docs_name + '  %}') }}
   {% do results.print_table(max_rows=max_rows, max_columns=max_columns, max_column_width=max_column_width, max_precision=max_precision) %}
-  {{ log('{% enddocs %}', info=True) }}
+  {{ print('{% enddocs %}') }}
 {% endif %}
 
 {% endmacro %}
