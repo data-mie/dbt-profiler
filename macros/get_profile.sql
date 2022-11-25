@@ -95,7 +95,7 @@
           {% if "avg" not in exclude_measures -%}
             {% if dbt_profiler.is_numeric_dtype(data_type) %}
                 avg({{ adapter.quote(column_name) }})
-            {% elif dbt_profiler.is_numeric_dtype(data_type) %}
+            {% elif dbt_profiler.is_logical_dtype(data_type) %}
                 avg(case when {{ adapter.quote(column_name) }} then 1 else 0 end)
             {% else %}
                 cast(null as numeric)
