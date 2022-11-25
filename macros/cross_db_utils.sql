@@ -34,6 +34,17 @@
 {%- endmacro -%}
 
 
+{# is_logical_dtype  -------------------------------------------------     #}
+
+{%- macro is_logical_dtype(dtype) -%}
+  {{ return(adapter.dispatch("is_logical_dtype", macro_namespace="dbt_profiler")(dtype)) }}
+{%- endmacro -%}
+
+{%- macro default__is_logical_dtype(dtype) -%}
+  {% set is_bool = dtype.startswith("bool") %}
+  {% do return(is_bool) %}
+{%- endmacro -%}
+
 {# is_date_or_time_dtype  -------------------------------------------------     #}
 
 {%- macro is_date_or_time_dtype(dtype) -%}

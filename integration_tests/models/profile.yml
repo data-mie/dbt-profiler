@@ -38,12 +38,12 @@ models:
       - name: avg
         tests:
           - not_null:
-              where: &column_is_numeric column_name not like 'string%' and column_name not like 'date%'
+              where: &column_is_numeric_or_bool column_name not like 'string%' and column_name not like 'date%'
 
       - name: min
         tests:
           - not_null:
-              where: &column_is_numeric_or_date column_name not like 'string%'
+              where: &column_is_numeric_or_date column_name not like 'string%' and column_name not like 'bool%'
 
       - name: max
         tests:
@@ -53,7 +53,7 @@ models:
       - name: std_dev_population
         tests:
           - not_null:
-              where: *column_is_numeric
+              where: &column_is_numeric column_name not like 'string%' and column_name not like 'date%' and column_name not like 'bool%'
 
       - name: std_dev_sample
         tests:
