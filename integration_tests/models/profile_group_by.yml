@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: profile_group_by
+
+    columns:
+      - name: group_by
+        tests:
+          - dbt_expectations.expect_column_to_exist
+
+    tests:
+      - dbt_expectations.expect_multicolumn_sum_to_equal:
+          column_list: [ "row_count" ]
+          sum_total: 2
+          row_condition: "group_by = 'A' and column_name = 'id'"

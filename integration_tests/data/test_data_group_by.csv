@@ -1,0 +1,6 @@
+id,group_by,numeric_not_nullable,numeric_nullable,string_not_nullable,string_nullable,date_nullable,bool_nullable
+1,A,1,1,one,one,2022-01-01,true
+2,A,2,,two,,2022-01-01,false
+3,B,3,3,three,three,,
+4,C,2,,two,,,true
+5,C,1,1,one,one,2022-01-01,true
