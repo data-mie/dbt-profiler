@@ -125,7 +125,11 @@ This macro returns a relation profile as a SQL query that can be used in a dbt m
 * `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 * `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
 * `where_clause` (optional): SQL `WHERE` clause to allow exclustion of records from profiler.
+<<<<<<< HEAD
 * `group_by` (optional): SQL `group_by` to aggregate data from profiler (default: `[]`)
+=======
+* `group_by` (optional): SQL `group_by` to aggregate data from profiler.
+>>>>>>> main
 
 ### Usage
 
