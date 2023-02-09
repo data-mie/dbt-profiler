@@ -1,10 +1,10 @@
-{% macro get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=none) %}
+{% macro get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
   {{ return(adapter.dispatch("get_profile", macro_namespace="dbt_profiler")(relation, exclude_measures, include_columns, exclude_columns, where_clause, group_by)) }}
 {% endmacro %}
 
 
 
-{% macro default__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=none) %}
+{% macro default__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -69,9 +69,9 @@
       {% for column_name in profile_column_names %}
         {% set data_type = data_type_map.get(column_name.lower(), "") %}
         select
-          {% if group_by %}
-            {{ group_by }},
-          {% endif %}
+          {%- for group_by_column in group_by %}
+            {{ group_by_column }},
+          {%- endfor %}
           lower('{{ column_name }}') as column_name,
           nullif(lower('{{ data_type }}'), '') as data_type,
           {% if "row_count" not in exclude_measures -%}
@@ -114,16 +114,16 @@
           {{ loop.index }} as _column_position
         from source_data
         {% if group_by %}
-          group by {{ group_by }}, lower('{{ column_name }}')
+          group by {{ group_by | join(", ") }}
         {% endif %}
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
     )
 
     select
-      {% if group_by %}
-        {{ group_by }},
-      {% endif %}
+      {%- for group_by_column in group_by %}
+        {{ group_by_column }},
+      {%- endfor %}
       column_name,
       data_type,
       {% for measure in include_measures %}
@@ -131,7 +131,7 @@
       {% endfor %}
       profiled_at
     from column_profiles
-    order by {% if group_by %} {{ group_by }} asc, {% endif %} _column_position asc
+    order by {% if group_by %}{{ group_by | join(", ") }},{% endif %} _column_position asc
   {% endset %}
 
   {% do return(profile_sql) %}
