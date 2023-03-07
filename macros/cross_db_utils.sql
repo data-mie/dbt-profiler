@@ -56,6 +56,16 @@
   {% do return(is_date_or_time) %}
 {%- endmacro -%}
 
+{# is_struct_dtype  -------------------------------------------------     #}
+
+{%- macro is_struct_dtype(dtype) -%}
+  {{ return(adapter.dispatch("is_struct_dtype", macro_namespace="dbt_profiler")(dtype)) }}
+{%- endmacro -%}
+
+{%- macro default__is_struct_dtype(dtype) -%}
+  {% do return((dtype | lower).startswith('struct')) %}
+{%- endmacro -%}
+
 {# information_schema  -------------------------------------------------     #}
 
 {%- macro information_schema(relation) -%}
