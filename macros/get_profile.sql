@@ -135,7 +135,7 @@
 
 
 
-{% macro databricks__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none) %}
+{% macro databricks__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -205,6 +205,9 @@
       {% for column_name in profile_column_names %}
         {% set data_type = data_type_map.get(column_name.lower(), "") %}
         select 
+          {%- for group_by_column in group_by %}
+            {{ group_by_column }},
+          {%- endfor %}
           lower('{{ column_name }}') as column_name,
           nullif(lower('{{ data_type }}'), '') as data_type,
           {% if "row_count" not in exclude_measures -%}
@@ -240,11 +243,17 @@
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
+        {% if group_by %}
+          group by {{ group_by | join(", ") }}
+        {% endif %}
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
     )
 
     select
+      {%- for group_by_column in group_by %}
+        {{ group_by_column }},
+      {%- endfor %}
       column_name,
       data_type,
       {% for measure in include_measures %}
@@ -252,7 +261,7 @@
       {% endfor %}
       profiled_at
     from column_profiles
-    order by _column_position asc
+    order by {% if group_by %}{{ group_by | join(", ") }},{% endif %} _column_position asc
   {% endset %}
 
   {# {{ print(profile_sql) }} #}
@@ -264,7 +273,7 @@
 
 
 
-{% macro sqlserver__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none) %}
+{% macro sqlserver__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -329,6 +338,9 @@
       {% for column_name in profile_column_names %}
         {% set data_type = data_type_map.get(column_name.lower(), "") %}
         select 
+          {%- for group_by_column in group_by %}
+            {{ group_by_column }},
+          {%- endfor %}
           lower('{{ column_name }}') as column_name,
           nullif(lower('{{ data_type }}'), '') as data_type,
           {% if "row_count" not in exclude_measures -%}
@@ -364,12 +376,17 @@
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
-
+        {% if group_by %}
+          group by {{ group_by | join(", ") }}
+        {% endif %}
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
     )
 
     select top 100 percent
+      {%- for group_by_column in group_by %}
+        {{ group_by_column }},
+      {%- endfor %}
       column_name,
       data_type,
       {% for measure in include_measures %}
@@ -377,7 +394,7 @@
       {% endfor %}
       profiled_at
     from column_profiles
-    order by _column_position asc
+    order by {% if group_by %}{{ group_by | join(", ") }},{% endif %} _column_position asc
   {% endset %}
 
   {% do return(profile_sql) %}
