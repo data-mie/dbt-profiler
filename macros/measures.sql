@@ -27,11 +27,11 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 {%- endmacro -%}
 
 {%- macro default__measure_distinct_proportion(column_name, data_type) -%}
-{% if not dbt_profiler.is_struct_dtype(data_type) -%}
+{%- if not dbt_profiler.is_struct_dtype(data_type) -%}
     count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as numeric)
-{% else -%}
-    null
-{% endif -%}
+{%- else -%}
+    cast(null as numeric)
+{%- endif -%}
 {%- endmacro -%}
 
 {# measure_distinct_count  -------------------------------------------------     #}
@@ -41,11 +41,11 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 {%- endmacro -%}
 
 {%- macro default__measure_distinct_count(column_name, data_type) -%}
-{% if not dbt_profiler.is_struct_dtype(data_type) -%}
+{%- if not dbt_profiler.is_struct_dtype(data_type) -%}
     count(distinct {{ adapter.quote(column_name) }})
-{% else -%}
-    null
-{% endif -%}
+{%- else -%}
+    cast(null as numeric)
+{%- endif -%}
 {%- endmacro -%}
 
 {# measure_is_unique  -------------------------------------------------     #}
@@ -55,11 +55,15 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 {%- endmacro -%}
 
 {%- macro default__measure_is_unique(column_name, data_type) -%}
-{% if not dbt_profiler.is_struct_dtype(data_type) -%}
+{%- if not dbt_profiler.is_struct_dtype(data_type) -%}
     count(distinct {{ adapter.quote(column_name) }}) = count(*)
-{% else -%}
+{%- else -%}
     null
-{% endif -%}
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro sqlserver__measure_is_unique(column_name, data_type) -%}
+case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 else 0 end
 {%- endmacro -%}
 
 
@@ -70,11 +74,11 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 {%- endmacro -%}
 
 {%- macro default__measure_min(column_name, data_type) -%}
-{% if (dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type)) and not dbt_profiler.is_struct_dtype(data_type) -%}
+{%- if (dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type)) and not dbt_profiler.is_struct_dtype(data_type) -%}
     cast(min({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }})
-{% else -%}
+{%- else -%}
     cast(null as {{ dbt_profiler.type_string() }})
-{% endif -%}
+{%- endif -%}
 {%- endmacro -%}
 
 {# measure_max  -------------------------------------------------     #}
@@ -84,11 +88,11 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 {%- endmacro -%}
 
 {%- macro default__measure_max(column_name, data_type) -%}
-{% if (dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type)) and not dbt_profiler.is_struct_dtype(data_type) -%}
+{%- if (dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type)) and not dbt_profiler.is_struct_dtype(data_type) -%}
     cast(max({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }})
-{% else -%}
+{%- else -%}
     cast(null as {{ dbt_profiler.type_string() }})
-{% endif -%}
+{%- endif -%}
 {%- endmacro -%}
 
 
@@ -100,13 +104,13 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 
 {%- macro default__measure_avg(column_name, data_type) -%}
 
-{% if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) %}
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     avg({{ adapter.quote(column_name) }})
-{% elif dbt_profiler.is_logical_dtype(data_type) %}
+{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
     avg(case when {{ adapter.quote(column_name) }} then 1 else 0 end)
-{% else %}
+{%- else -%}
     cast(null as numeric)
-{% endif %}
+{%- endif -%}
 
 {%- endmacro -%}
 
@@ -119,13 +123,25 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 
 {%- macro default__measure_std_dev_population(column_name, data_type) -%}
 
-{% if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) %}
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     stddev_pop({{ adapter.quote(column_name) }})
-{% else %}
+{%- else -%}
     cast(null as numeric)
-{% endif %}
+{%- endif -%}
 
 {%- endmacro -%}
+
+
+{%- macro sqlserver__measure_std_dev_population(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
+    stdevp({{ adapter.quote(column_name) }})
+{%- else -%}
+    cast(null as numeric)
+{%- endif -%}
+
+{%- endmacro -%}
+
 
 
 {# measure_std_dev_sample  -------------------------------------------------     #}
@@ -136,10 +152,20 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 
 {%- macro default__measure_std_dev_sample(column_name, data_type) -%}
 
-{% if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) %}
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     stddev_samp({{ adapter.quote(column_name) }})
-{% else %}
+{%- else -%}
     cast(null as numeric)
-{% endif %}
+{%- endif -%}
+
+{%- endmacro -%}
+
+{%- macro sqlserver__measure_std_dev_sample(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
+    stdev({{ adapter.quote(column_name) }})
+{%- else -%}
+    cast(null as numeric)
+{%- endif -%}
 
 {%- endmacro -%}
