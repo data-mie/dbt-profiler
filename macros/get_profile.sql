@@ -75,40 +75,34 @@
           lower('{{ column_name }}') as column_name,
           nullif(lower('{{ data_type }}'), '') as data_type,
           {% if "row_count" not in exclude_measures -%}
-            cast(count(*) as numeric) as row_count,
+            {{ dbt_profiler.measure_row_count(column_name, data_type) }} as row_count,
           {%- endif %}
           {% if "not_null_proportion" not in exclude_measures -%}
-            sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as numeric) as not_null_proportion,
+            {{ dbt_profiler.measure_not_null_proportion(column_name, data_type) }} as not_null_proportion,
           {%- endif %}
           {% if "distinct_proportion" not in exclude_measures -%}
-            count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as numeric) as distinct_proportion,
+            {{ dbt_profiler.measure_distinct_proportion(column_name, data_type) }} as distinct_proportion,
           {%- endif %}
           {% if "distinct_count" not in exclude_measures -%}
-            count(distinct {{ adapter.quote(column_name) }}) as distinct_count,
+            {{ dbt_profiler.measure_distinct_count(column_name, data_type) }} as distinct_count,
           {%- endif %}
           {% if "is_unique" not in exclude_measures -%}
-            count(distinct {{ adapter.quote(column_name) }}) = count(*) as is_unique,
+            {{ dbt_profiler.measure_is_unique(column_name, data_type) }} as is_unique,
           {%- endif %}
           {% if "min" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type) %}cast(min({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }}){% else %}null{% endif %} as min,
+            {{ dbt_profiler.measure_min(column_name, data_type) }} as min,
           {%- endif %}
           {% if "max" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type) %}cast(max({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }}){% else %}null{% endif %} as max,
+            {{ dbt_profiler.measure_max(column_name, data_type) }} as max,
           {%- endif %}
           {% if "avg" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}
-                avg({{ adapter.quote(column_name) }})
-            {% elif dbt_profiler.is_logical_dtype(data_type) %}
-                avg(case when {{ adapter.quote(column_name) }} then 1 else 0 end)
-            {% else %}
-                cast(null as numeric)
-            {% endif %} as avg,
+            {{ dbt_profiler.measure_avg(column_name, data_type) }} as avg,
           {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}stddev_pop({{ adapter.quote(column_name) }}){% else %}cast(null as numeric){% endif %} as std_dev_population,
+            {{ dbt_profiler.measure_std_dev_population(column_name, data_type) }} as std_dev_population,
           {%- endif %}
           {% if "std_dev_sample" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}stddev_samp({{ adapter.quote(column_name) }}){% else %}cast(null as numeric){% endif %} as std_dev_sample,
+            {{ dbt_profiler.measure_std_dev_sample(column_name, data_type) }} as std_dev_sample,
           {%- endif %}
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
@@ -141,7 +135,7 @@
 
 
 
-{% macro databricks__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none) %}
+{% macro databricks__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -211,46 +205,55 @@
       {% for column_name in profile_column_names %}
         {% set data_type = data_type_map.get(column_name.lower(), "") %}
         select 
+          {%- for group_by_column in group_by %}
+            {{ group_by_column }},
+          {%- endfor %}
           lower('{{ column_name }}') as column_name,
           nullif(lower('{{ data_type }}'), '') as data_type,
           {% if "row_count" not in exclude_measures -%}
-            cast(count(*) as numeric) as row_count,
+            {{ dbt_profiler.measure_row_count(column_name, data_type) }} as row_count,
           {%- endif %}
           {% if "not_null_proportion" not in exclude_measures -%}
-            sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as numeric) as not_null_proportion,
+            {{ dbt_profiler.measure_not_null_proportion(column_name, data_type) }} as not_null_proportion,
           {%- endif %}
           {% if "distinct_proportion" not in exclude_measures -%}
-            count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as numeric) as distinct_proportion,
+            {{ dbt_profiler.measure_distinct_proportion(column_name, data_type) }} as distinct_proportion,
           {%- endif %}
           {% if "distinct_count" not in exclude_measures -%}
-            count(distinct {{ adapter.quote(column_name) }}) as distinct_count,
+            {{ dbt_profiler.measure_distinct_count(column_name, data_type) }} as distinct_count,
           {%- endif %}
           {% if "is_unique" not in exclude_measures -%}
-            count(distinct {{ adapter.quote(column_name) }}) = count(*) as is_unique,
+            {{ dbt_profiler.measure_is_unique(column_name, data_type) }} as is_unique,
           {%- endif %}
           {% if "min" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type) %}cast(min({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }}){% else %}null{% endif %} as min,
+            {{ dbt_profiler.measure_min(column_name, data_type) }} as min,
           {%- endif %}
           {% if "max" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type) %}cast(max({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }}){% else %}null{% endif %} as max,
+            {{ dbt_profiler.measure_max(column_name, data_type) }} as max,
           {%- endif %}
           {% if "avg" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}avg({{ adapter.quote(column_name) }}){% else %}cast(null as numeric){% endif %} as avg,
+            {{ dbt_profiler.measure_avg(column_name, data_type) }} as avg,
           {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}stddev_pop({{ adapter.quote(column_name) }}){% else %}cast(null as numeric){% endif %} as std_dev_population,
+            {{ dbt_profiler.measure_std_dev_population(column_name, data_type) }} as std_dev_population,
           {%- endif %}
           {% if "std_dev_sample" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}stddev_samp({{ adapter.quote(column_name) }}){% else %}cast(null as numeric){% endif %} as std_dev_sample,
+            {{ dbt_profiler.measure_std_dev_sample(column_name, data_type) }} as std_dev_sample,
           {%- endif %}
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
+        {% if group_by %}
+          group by {{ group_by | join(", ") }}
+        {% endif %}
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
     )
 
     select
+      {%- for group_by_column in group_by %}
+        {{ group_by_column }},
+      {%- endfor %}
       column_name,
       data_type,
       {% for measure in include_measures %}
@@ -258,7 +261,7 @@
       {% endfor %}
       profiled_at
     from column_profiles
-    order by _column_position asc
+    order by {% if group_by %}{{ group_by | join(", ") }},{% endif %} _column_position asc
   {% endset %}
 
   {# {{ print(profile_sql) }} #}
@@ -270,7 +273,7 @@
 
 
 
-{% macro sqlserver__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none) %}
+{% macro sqlserver__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -335,47 +338,55 @@
       {% for column_name in profile_column_names %}
         {% set data_type = data_type_map.get(column_name.lower(), "") %}
         select 
+          {%- for group_by_column in group_by %}
+            {{ group_by_column }},
+          {%- endfor %}
           lower('{{ column_name }}') as column_name,
           nullif(lower('{{ data_type }}'), '') as data_type,
           {% if "row_count" not in exclude_measures -%}
-            cast(count(*) as numeric) as row_count,
+            {{ dbt_profiler.measure_row_count(column_name, data_type) }} as row_count,
           {%- endif %}
           {% if "not_null_proportion" not in exclude_measures -%}
-            round(sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as numeric), 2) as not_null_proportion,
+            {{ dbt_profiler.measure_not_null_proportion(column_name, data_type) }} as not_null_proportion,
           {%- endif %}
           {% if "distinct_proportion" not in exclude_measures -%}
-            round(count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as numeric), 2) as distinct_proportion,
+            {{ dbt_profiler.measure_distinct_proportion(column_name, data_type) }} as distinct_proportion,
           {%- endif %}
           {% if "distinct_count" not in exclude_measures -%}
-            count(distinct {{ adapter.quote(column_name) }}) as distinct_count,
+            {{ dbt_profiler.measure_distinct_count(column_name, data_type) }} as distinct_count,
           {%- endif %}
           {% if "is_unique" not in exclude_measures -%}
-            case when count(distinct {{ adapter.quote(column_name) }}) = count(*) THEN 1 ELSE 0 END as is_unique,
+            {{ dbt_profiler.measure_is_unique(column_name, data_type) }} as is_unique,
           {%- endif %}
           {% if "min" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type) %}cast(min({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }}){% else %}null{% endif %} as min,
+            {{ dbt_profiler.measure_min(column_name, data_type) }} as min,
           {%- endif %}
           {% if "max" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) or dbt_profiler.is_date_or_time_dtype(data_type) %}cast(max({{ adapter.quote(column_name) }}) as {{ dbt_profiler.type_string() }}){% else %}null{% endif %} as max,
+            {{ dbt_profiler.measure_max(column_name, data_type) }} as max,
           {%- endif %}
           {% if "avg" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}avg(cast({{ adapter.quote(column_name) }} as numeric)){% else %}cast(null as numeric){% endif %} as avg,
+            {{ dbt_profiler.measure_avg(column_name, data_type) }} as avg,
           {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}stdevp({{ adapter.quote(column_name) }}){% else %}cast(null as numeric){% endif %} as std_dev_population,
+            {{ dbt_profiler.measure_std_dev_population(column_name, data_type) }} as std_dev_population,
           {%- endif %}
           {% if "std_dev_sample" not in exclude_measures -%}
-            {% if dbt_profiler.is_numeric_dtype(data_type) %}stdevp({{ adapter.quote(column_name) }}){% else %}cast(null as numeric){% endif %} as std_dev_sample,
+            {{ dbt_profiler.measure_std_dev_sample(column_name, data_type) }} as std_dev_sample,
           {%- endif %}
           cast(current_timestamp as {{ dbt_profiler.type_string() }}) as profiled_at,
           {{ loop.index }} as _column_position
         from source_data
-
+        {% if group_by %}
+          group by {{ group_by | join(", ") }}
+        {% endif %}
         {% if not loop.last %}union all{% endif %}
       {% endfor %}
     )
 
     select top 100 percent
+      {%- for group_by_column in group_by %}
+        {{ group_by_column }},
+      {%- endfor %}
       column_name,
       data_type,
       {% for measure in include_measures %}
@@ -383,7 +394,7 @@
       {% endfor %}
       profiled_at
     from column_profiles
-    order by _column_position asc
+    order by {% if group_by %}{{ group_by | join(", ") }},{% endif %} _column_position asc
   {% endset %}
 
   {% do return(profile_sql) %}

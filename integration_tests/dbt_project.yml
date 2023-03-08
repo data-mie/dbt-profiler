@@ -17,3 +17,6 @@ clean-targets:
 
 seeds:
   +quote_columns: false
+
+models:
+  +materialized: table
