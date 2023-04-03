@@ -89,21 +89,24 @@ One of the advantages of the `doc` approach over the `meta` approach is that it 
 
 `dbt-profiler` may work with unsupported adapters but they haven't been tested yet. If you've used `dbt-profiler` with any of the unsupported adapters I'd love to hear your feedback (e.g., create an issue, PR or hit me with with a DM on [dbt Slack](https://community.getdbt.com/)) 😊
 
-✅ PostgreSQL
+✅ AWS Athena
 
 ✅ BigQuery
 
-✅ Snowflake
+✅ Databricks
+
+✅ PostgreSQL
 
 ✅ Redshift
 
-✅ Databricks
+✅ Snowflake
 
 ✅ SQL Server
 
 ❌ Apache Spark
 
 ❌ Presto
+
 
 # Contents
 * [get_profile](#get_profile-source)
