@@ -5,7 +5,7 @@
 {%- endmacro -%}
 
 {%- macro default__measure_row_count(column_name, data_type) -%}
-cast(count(*) as numeric)
+cast(count(*) as {{ dbt.type_numeric() }})
 {%- endmacro -%}
 
 
@@ -16,7 +16,7 @@ cast(count(*) as numeric)
 {%- endmacro -%}
 
 {%- macro default__measure_not_null_proportion(column_name, data_type) -%}
-sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as numeric)
+sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as {{ dbt.type_numeric() }})
 {%- endmacro -%}
 
 
@@ -28,9 +28,9 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 
 {%- macro default__measure_distinct_proportion(column_name, data_type) -%}
 {%- if not dbt_profiler.is_struct_dtype(data_type) -%}
-    count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as numeric)
+    count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as {{ dbt.type_numeric() }})
 {%- else -%}
-    cast(null as numeric)
+    cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
 {%- endmacro -%}
 
@@ -44,7 +44,7 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 {%- if not dbt_profiler.is_struct_dtype(data_type) -%}
     count(distinct {{ adapter.quote(column_name) }})
 {%- else -%}
-    cast(null as numeric)
+    cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
 {%- endmacro -%}
 
@@ -109,7 +109,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- elif dbt_profiler.is_logical_dtype(data_type) -%}
     avg(case when {{ adapter.quote(column_name) }} then 1 else 0 end)
 {%- else -%}
-    cast(null as numeric)
+    cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
 
 {%- endmacro -%}
@@ -126,7 +126,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     stddev_pop({{ adapter.quote(column_name) }})
 {%- else -%}
-    cast(null as numeric)
+    cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
 
 {%- endmacro -%}
@@ -137,7 +137,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- if dbt_profiler.is_numeric_dtype(data_type) -%}
     stdevp({{ adapter.quote(column_name) }})
 {%- else -%}
-    cast(null as numeric)
+    cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
 
 {%- endmacro -%}
@@ -155,7 +155,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     stddev_samp({{ adapter.quote(column_name) }})
 {%- else -%}
-    cast(null as numeric)
+    cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
 
 {%- endmacro -%}
@@ -165,7 +165,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- if dbt_profiler.is_numeric_dtype(data_type) -%}
     stdev({{ adapter.quote(column_name) }})
 {%- else -%}
-    cast(null as numeric)
+    cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
 
 {%- endmacro -%}
