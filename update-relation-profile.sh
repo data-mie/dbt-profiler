@@ -10,8 +10,8 @@ fi
 
 RUN_OPERATION_OUTPUT=$(dbt run-operation print_profile_docs --args '{"schema": "'$schema'", "relation_name": "'$relation_name'", "docs_name": "dbt_profiler_results__'$schema'_'$relation_name'"}')
 
-# The hacky sed gets rid of everything in the output that comes before {& docs (e.g., Running with dbt=0.20.0 )
-PROFILE=$(echo "$RUN_OPERATION_OUTPUT" | sed -n '/{% docs/,$p')
+# Extract docs block from stdout
+PROFILE=$(echo "$RUN_OPERATION_OUTPUT" | awk '/{%.docs.*%}$/{flag=1} flag; /{%.enddocs.%}/{flag=0}')
 
 output_dir=docs/dbt_profiler/$schema
 output_path=$output_dir/$relation_name.md
