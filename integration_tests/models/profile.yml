@@ -43,7 +43,7 @@ models:
       - name: median
         tests:
           - not_null:
-              where: &column_is_numeric_or_bool column_name not like 'string%' and column_name not like 'date%'
+              where: *column_is_numeric_or_bool
 
       - name: min
         tests:
