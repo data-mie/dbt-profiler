@@ -154,6 +154,7 @@
   "min",
   "max",
   "avg",
+  "median",
   "std_dev_population",
   "std_dev_sample"
 ] -%}
@@ -295,6 +296,7 @@
   "min",
   "max",
   "avg",
+  "median",
   "std_dev_population",
   "std_dev_sample"
 ] -%}
