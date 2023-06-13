@@ -13,6 +13,7 @@
 * `min`*^: Minimum column value
 * `max`*^: Maximum column value
 * `avg`**^: Average column value
+* `median`**^: Median column value
 * `std_dev_population`**^: Population standard deviation
 * `std_dev_sample`**^: Sample standard deviation
 * `profiled_at`: Profile calculation date and time
