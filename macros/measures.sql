@@ -123,10 +123,8 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- macro default__measure_median(column_name, data_type) -%}
 
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
     median({{ adapter.quote(column_name) }})
-{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
-    median(case when {{ adapter.quote(column_name) }} then 1 else 0 end)
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
@@ -135,10 +133,8 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- macro bigquery__measure_median(column_name, data_type) -%}
 
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
     percentile_disc({{ adapter.quote(column_name) }}, 0.5) over ()
-{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
-    percentile_disc(case when {{ adapter.quote(column_name) }} then 1 else 0 end, 0.5) over ()
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
@@ -147,10 +143,8 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- macro postgres__measure_median(column_name, data_type) -%}
 
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    percentile_cont({{ adapter.quote(column_name) }}, 0.5) over ()
-{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
-    percentile_cont(case when {{ adapter.quote(column_name) }} then 1 else 0 end, 0.5) over ()
+{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
+    percentile_cont(0.5) within group (order by {{ adapter.quote(column_name) }})
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
@@ -159,10 +153,8 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- macro sql_server__measure_median(column_name, data_type) -%}
 
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
     percentile_cont({{ adapter.quote(column_name) }}, 0.5) over ()
-{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
-    percentile_cont(case when {{ adapter.quote(column_name) }} then 1 else 0 end, 0.5) over ()
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
