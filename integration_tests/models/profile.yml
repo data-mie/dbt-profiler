@@ -40,11 +40,6 @@ models:
           - not_null:
               where: &column_is_numeric_or_bool column_name not like 'string%' and column_name not like 'date%'
 
-      - name: median
-        tests:
-          - not_null:
-              where: *column_is_numeric_or_bool
-
       - name: min
         tests:
           - not_null:
@@ -61,6 +56,11 @@ models:
               where: &column_is_numeric column_name not like 'string%' and column_name not like 'date%' and column_name not like 'bool%'
 
       - name: std_dev_sample
+        tests:
+          - not_null:
+              where: *column_is_numeric
+
+      - name: median
         tests:
           - not_null:
               where: *column_is_numeric
