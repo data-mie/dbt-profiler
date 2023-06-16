@@ -134,7 +134,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- macro bigquery__measure_median(column_name, data_type) -%}
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) -%}
-    percentile_disc({{ adapter.quote(column_name) }}, 0.5) over ()
+    APPROX_QUANTILES({{ adapter.quote(column_name) }}, 100)[OFFSET(50)]
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
