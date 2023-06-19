@@ -123,7 +123,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- macro default__measure_median(column_name, data_type) -%}
 
-{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     median({{ adapter.quote(column_name) }})
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
@@ -133,7 +133,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- macro bigquery__measure_median(column_name, data_type) -%}
 
-{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     APPROX_QUANTILES({{ adapter.quote(column_name) }}, 100)[OFFSET(50)]
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
@@ -143,7 +143,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- macro postgres__measure_median(column_name, data_type) -%}
 
-{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     percentile_cont(0.5) within group (order by {{ adapter.quote(column_name) }})
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
@@ -153,7 +153,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- macro sql_server__measure_median(column_name, data_type) -%}
 
-{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     percentile_cont({{ adapter.quote(column_name) }}, 0.5) over ()
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
