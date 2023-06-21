@@ -60,6 +60,11 @@ models:
           - not_null:
               where: *column_is_numeric
 
+      - name: median
+        tests:
+          - not_null:
+              where: *column_is_numeric
+
       - name: profiled_at
         tests:
           - not_null

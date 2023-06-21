@@ -115,6 +115,52 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- endmacro -%}
 
 
+{# measure_median  -------------------------------------------------     #}
+
+{%- macro measure_median(column_name, data_type) -%}
+  {{ return(adapter.dispatch("measure_median", macro_namespace="dbt_profiler")(column_name, data_type)) }}
+{%- endmacro -%}
+
+{%- macro default__measure_median(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    median({{ adapter.quote(column_name) }})
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
+{%- macro bigquery__measure_median(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    APPROX_QUANTILES({{ adapter.quote(column_name) }}, 100)[OFFSET(50)]
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
+{%- macro postgres__measure_median(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    percentile_cont(0.5) within group (order by {{ adapter.quote(column_name) }})
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
+{%- macro sql_server__measure_median(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    percentile_cont({{ adapter.quote(column_name) }}, 0.5) over ()
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
 {# measure_std_dev_population  -------------------------------------------------     #}
 
 {%- macro measure_std_dev_population(column_name, data_type) -%}

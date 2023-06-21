@@ -19,6 +19,7 @@
   "min",
   "max",
   "avg",
+  "median",
   "std_dev_population",
   "std_dev_sample"
 ] -%}
@@ -98,6 +99,9 @@
           {% if "avg" not in exclude_measures -%}
             {{ dbt_profiler.measure_avg(column_name, data_type) }} as avg,
           {%- endif %}
+          {% if "median" not in exclude_measures -%}
+            {{ dbt_profiler.measure_median(column_name, data_type) }} as median,
+          {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
             {{ dbt_profiler.measure_std_dev_population(column_name, data_type) }} as std_dev_population,
           {%- endif %}
@@ -150,6 +154,7 @@
   "min",
   "max",
   "avg",
+  "median",
   "std_dev_population",
   "std_dev_sample"
 ] -%}
@@ -234,6 +239,9 @@
           {% if "avg" not in exclude_measures -%}
             {{ dbt_profiler.measure_avg(column_name, data_type) }} as avg,
           {%- endif %}
+          {% if "median" not in exclude_measures -%}
+            {{ dbt_profiler.measure_median(column_name, data_type) }} as median,
+          {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
             {{ dbt_profiler.measure_std_dev_population(column_name, data_type) }} as std_dev_population,
           {%- endif %}
@@ -288,6 +296,7 @@
   "min",
   "max",
   "avg",
+  "median",
   "std_dev_population",
   "std_dev_sample"
 ] -%}
@@ -366,6 +375,9 @@
           {%- endif %}
           {% if "avg" not in exclude_measures -%}
             {{ dbt_profiler.measure_avg(column_name, data_type) }} as avg,
+          {%- endif %}
+          {% if "median" not in exclude_measures -%}
+            {{ dbt_profiler.measure_median(column_name, data_type) }} as median,
           {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
             {{ dbt_profiler.measure_std_dev_population(column_name, data_type) }} as std_dev_population,
