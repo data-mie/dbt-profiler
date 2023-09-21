@@ -37,6 +37,10 @@ For the third point there are at least two options:
 
 An example of the first is implemented in the [print_profile_schema](#print_profile_schema-source) macro. The second can be achieved with the following pattern:
 
+0. Add a `"docs"` folder explicitly to `dbt_project.yml` via [`model-paths`](https://docs.getdbt.com/reference/project-configs/model-paths)
+```
+model-paths: ["models", "docs"]
+```
 1. Use [print_profile_docs](#print_profile_docs-source) macro to generate the profile as a Markdown table wrapped in a Jinja `docs` macro
 2. Copy the output to a `docs/dbt_profiler/<model>.md` file
 ```
