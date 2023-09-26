@@ -115,6 +115,18 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- endmacro -%}
 
 
+{%- macro redshift__measure_avg(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    avg({{ adapter.quote(column_name) }}::float)
+{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
+    avg(case when {{ adapter.quote(column_name) }} then 1.0 else 0.0 end)
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
 {# measure_median  -------------------------------------------------     #}
 
 {%- macro measure_median(column_name, data_type) -%}
