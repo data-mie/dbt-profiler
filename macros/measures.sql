@@ -129,8 +129,8 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {# measure_median  -------------------------------------------------     #}
 
-{%- macro measure_median(column_name, data_type) -%}
-  {{ return(adapter.dispatch("measure_median", macro_namespace="dbt_profiler")(column_name, data_type)) }}
+{%- macro measure_median(column_name, data_type, cte_name) -%}
+  {{ return(adapter.dispatch("measure_median", macro_namespace="dbt_profiler")(column_name, data_type, cte_name)) }}
 {%- endmacro -%}
 
 {%- macro default__measure_median(column_name, data_type) -%}
@@ -157,6 +157,16 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     percentile_cont(0.5) within group (order by {{ adapter.quote(column_name) }})
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
+{%- macro redshift__measure_median(column_name, data_type, cte_name) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    select percentile_cont(0.5) within group (order by {{ adapter.quote(column_name) }}) from {{ cte_name }}
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
