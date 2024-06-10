@@ -100,7 +100,7 @@
             {{ dbt_profiler.measure_avg(column_name, data_type) }} as avg,
           {%- endif %}
           {% if "median" not in exclude_measures -%}
-            {{ dbt_profiler.measure_median(column_name, data_type) }} as median,
+            ({{ dbt_profiler.measure_median(column_name, data_type, 'source_data') }}) as median,
           {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
             {{ dbt_profiler.measure_std_dev_population(column_name, data_type) }} as std_dev_population,
@@ -240,7 +240,7 @@
             {{ dbt_profiler.measure_avg(column_name, data_type) }} as avg,
           {%- endif %}
           {% if "median" not in exclude_measures -%}
-            {{ dbt_profiler.measure_median(column_name, data_type) }} as median,
+            ({{ dbt_profiler.measure_median(column_name, data_type, 'source_data') }}) as median,
           {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
             {{ dbt_profiler.measure_std_dev_population(column_name, data_type) }} as std_dev_population,
@@ -377,7 +377,7 @@
             {{ dbt_profiler.measure_avg(column_name, data_type) }} as avg,
           {%- endif %}
           {% if "median" not in exclude_measures -%}
-            {{ dbt_profiler.measure_median(column_name, data_type) }} as median,
+            ({{ dbt_profiler.measure_median(column_name, data_type, 'source_data') }}) as median,
           {%- endif %}
           {% if "std_dev_population" not in exclude_measures -%}
             {{ dbt_profiler.measure_std_dev_population(column_name, data_type) }} as std_dev_population,
