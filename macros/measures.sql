@@ -173,6 +173,16 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- endmacro -%}
 
+{%- macro athena__measure_median(column_name, data_type, cte_name) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    approx_percentile( {{ adapter.quote(column_name) }}, 0.5)
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
 {%- macro sql_server__measure_median(column_name, data_type, cte_name) -%}
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
