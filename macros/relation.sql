@@ -46,3 +46,9 @@
 {% do run_query("select top(0) * from " ~ relation ~ "") %}
 
 {% endmacro %}
+
+{% macro oracle__assert_relation_exists(relation) %}
+
+{% do run_query("select * from " ~ relation ~ " where rownum < 0") %}
+
+{% endmacro %}
