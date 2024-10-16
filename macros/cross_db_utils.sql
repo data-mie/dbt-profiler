@@ -33,6 +33,10 @@
   {% do return(is_numeric) %}
 {%- endmacro -%}
 
+{%- macro athena__is_numeric_dtype(dtype) -%}
+  {% set is_numeric = "int" in dtype or "float" in dtype or "decimal" in dtype or "double" in dtype %}
+  {% do return(is_numeric) %}
+{%- endmacro -%}
 
 {# is_logical_dtype  -------------------------------------------------     #}
 
