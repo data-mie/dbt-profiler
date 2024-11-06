@@ -11,54 +11,10 @@
     {%- set startdocs = '{% docs ' ~ docs_name ~ '  %}' -%}
     {%- set enddocs = '{% enddocs %}' -%}
     
-    {# Check if macro is called in dbt Cloud? #}
-    {%- if flags.WHICH == 'rpc' -%}
-        {%- set is_dbt_cloud = true -%}
-    {%- else -%}
-        {%- set is_dbt_cloud = false -%}
-    {%- endif -%}
+    {{ print(startdocs) }}
+    {{ dbt_profiler.print_table(results, max_rows=max_rows, max_columns=max_columns, max_column_width=max_column_width, max_precision=max_precision) }}
+    {{ print(enddocs) }}
     
-    {% if not is_dbt_cloud %}
-    
-        {{ print(startdocs) }}
-        {% do results.print_table(max_rows=max_rows, max_columns=max_columns, max_column_width=max_column_width, max_precision=max_precision) %}
-        {{ print(enddocs) }}
-    
-    {% else %}
-    
-        {%- set profile_docs=[] -%}
-        {% do profile_docs.append(startdocs) -%}
-        {% do profile_docs.append('') %}
-    
-        {# Get header from column names #}
-        {%- set headers = results.column_names -%}
-        {%- set header = [] -%}
-        {%- set horizontal_line = [] -%}
-    
-        {% for i in range(0,headers|length) %}
-            {% do header.append(headers[i]) %}
-            {% do horizontal_line.append('---') %}
-        {% endfor %}
-        {% do profile_docs.append('| ' ~ header|join(' | ') ~ ' |') %}
-        {% do profile_docs.append('| ' ~ horizontal_line|join(' | ') ~ ' |') %}
-    
-        {# Get row values #}
-        {% for row in results.rows %}
-            {%- set list_row = [''] -%}
-            {% for val in row.values() %}
-                {% do list_row.append(val) %}
-            {% endfor %}
-            {% do profile_docs.append(list_row|join(' | ') ~ ' |') %}
-        {% endfor %}
-        {% do profile_docs.append('') %}
-        {% do profile_docs.append(enddocs) %}
-    
-        {# Join profile docs #}
-        {%- set joined = profile_docs | join ('\n') -%}
-        {{ log(joined, info=True) }}
-        {% do return(joined) %}
-    
-    {% endif %}
     
 {% endif %}
 
