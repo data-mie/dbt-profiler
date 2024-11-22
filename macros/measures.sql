@@ -5,7 +5,7 @@
 {%- endmacro -%}
 
 {%- macro default__measure_row_count(column_name, data_type) -%}
-cast(count(*) as {{ dbt.type_int() }})
+cast(count(*) as {{ dbt.type_bigint() }})
 {%- endmacro -%}
 
 
