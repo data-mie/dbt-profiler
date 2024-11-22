@@ -183,7 +183,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- endmacro -%}
 
-{%- macro sql_server__measure_median(column_name, data_type, cte_name) -%}
+{%- macro sqlserver__measure_median(column_name, data_type, cte_name) -%}
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     percentile_cont({{ adapter.quote(column_name) }}, 0.5) over ()
