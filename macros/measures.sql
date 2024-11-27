@@ -5,9 +5,12 @@
 {%- endmacro -%}
 
 {%- macro default__measure_row_count(column_name, data_type) -%}
-cast(count(*) as {{ dbt.type_numeric() }})
+cast(count(*) as {{ dbt.type_bigint() }})
 {%- endmacro -%}
 
+{%- macro oracle__measure_row_count(column_name, data_type) -%}
+cast(count(*) as {{ dbt.type_numeric() }})
+{%- endmacro -%}
 
 {# measure_not_null_proportion  -------------------------------------------------     #}
 
@@ -196,7 +199,17 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- endmacro -%}
 
-{%- macro sql_server__measure_median(column_name, data_type, cte_name) -%}
+{%- macro athena__measure_median(column_name, data_type, cte_name) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    approx_percentile( {{ adapter.quote(column_name) }}, 0.5)
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
+{%- macro sqlserver__measure_median(column_name, data_type, cte_name) -%}
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     percentile_cont({{ adapter.quote(column_name) }}, 0.5) over ()
