@@ -8,6 +8,9 @@
 cast(count(*) as {{ dbt.type_bigint() }})
 {%- endmacro -%}
 
+{%- macro oracle__measure_row_count(column_name, data_type) -%}
+cast(count(*) as {{ dbt.type_numeric() }})
+{%- endmacro -%}
 
 {# measure_not_null_proportion  -------------------------------------------------     #}
 
@@ -19,6 +22,11 @@ cast(count(*) as {{ dbt.type_bigint() }})
 sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as {{ dbt.type_numeric() }})
 {%- endmacro -%}
 
+{%- macro oracle__measure_not_null_proportion(column_name, data_type) -%}
+case when cast(count(*) as {{ dbt.type_numeric() }}) != 0 THEN 
+sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as {{ dbt.type_numeric() }})
+ELSE 0 END
+{%- endmacro -%}
 
 {# measure_distinct_proportion  -------------------------------------------------     #}
 
@@ -29,6 +37,16 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 {%- macro default__measure_distinct_proportion(column_name, data_type) -%}
 {%- if not dbt_profiler.is_struct_dtype(data_type) -%}
     count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as {{ dbt.type_numeric() }})
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro oracle__measure_distinct_proportion(column_name, data_type) -%}
+{%- if not dbt_profiler.is_struct_dtype(data_type) -%}
+	CASE WHEN cast(count(*) as {{ dbt.type_numeric() }}) != 0 THEN 
+    count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as {{ dbt.type_numeric() }})
+	ELSE 0 END
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
@@ -57,6 +75,14 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 {%- macro default__measure_is_unique(column_name, data_type) -%}
 {%- if not dbt_profiler.is_struct_dtype(data_type) -%}
     count(distinct {{ adapter.quote(column_name) }}) = count(*)
+{%- else -%}
+    null
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro oracle__measure_is_unique(column_name, data_type) -%}
+{%- if not dbt_profiler.is_struct_dtype(data_type) -%}
+    CASE WHEN count(distinct {{ adapter.quote(column_name) }}) = count(*) THEN 'Y' ELSE 'N' END
 {%- else -%}
     null
 {%- endif -%}
