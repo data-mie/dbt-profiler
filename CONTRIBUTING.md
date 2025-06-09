@@ -1,14 +1,68 @@
 # Contributing to `dbt-profiler`
 
-When contributing to this repository, please first discuss the change you wish to make via issue,
-email, or any other method with the owners of this repository before making a change. 
+Thanks for your interest in contributing to `dbt-profiler`! We welcome improvements, fixes, and new features from the community. Before you begin, please review this document to understand how we collaborate.
 
-Please note we have a code of conduct, please follow it in all your interactions with the project.
+We ask that you first discuss any significant changes via issue, email, or another form of communication before opening a pull request.
+
+Please also take a moment to review our Code of Conduct and follow it in all interactions with the project and community.
 
 ## Pull Request Process
 
-1. Update the [README.md](README.md) with details of changes to the package, this includes new macros and changes to existing ones.
-2. The Pull Request may be merged after there's a sign-off from at least one maintainer or contributor.
+To ensure a smooth development workflow and high-quality contributions, please follow these guidelines when submitting a pull request:
+
+### 1. Branch Naming Convention
+
+Use clear and consistent branch names. Prefix your branch with:
+
+- `feat/` for new features  
+  _Example: `feat/add-skew-measure`_
+- `fix/` for bug fixes  
+  _Example: `fix/avg-calculation-bigquery`_
+
+Note: The GitHub repository is configured to **automatically delete head branches after merge**, so you don’t need to clean up manually.
+
+### 2. CI Checks
+
+Pull requests will trigger a CircleCI pipeline with the following checks:
+
+- ✅ `integration-postgres` – runs automatically on all PRs.
+- 🔒 `integration-bigquery` – requires **explicit approval from a maintainer** in the CircleCI UI before running (due to usage of limited credentials).
+
+Please ensure both checks pass before requesting a review or merging the PR.
+
+### 3. Pull Request Requirements
+
+- Provide a **clear and descriptive title** for your PR.
+  - Avoid vague titles like "fix BigQuery adapter".
+  - Prefer descriptive ones like "Fix avg calculation in the BigQuery adapter".
+- Update the [README.md](README.md) with details of:
+  - New macros
+  - Changes to existing macros or functionality
+- Add or update tests where relevant.
+- Ensure the PR has been reviewed and approved by at least one maintainer before merging.
+
+## Release Process
+
+We follow [Semantic Versioning (semver)](https://semver.org/), using the format `MAJOR.MINOR.PATCH` (e.g., `0.9.0`).
+
+Only maintainers may publish new releases. Here's the process:
+
+1. **Prepare the Release**
+   - Ensure all merged PRs intended for the release have clear and descriptive titles. This improves the quality of the auto-generated release notes.
+   - Confirm that the `README.md` and other relevant documentation are up to date.
+
+2. **Create the Release on GitHub**
+   - Go to the [Releases](https://github.com/<your-org>/dbt-profiler/releases) section of the GitHub repository.
+   - Click **"Draft a new release"**.
+   - Set the **tag version** (e.g., `0.9.0`) and choose the same as the **release title**.
+   - Click **"Generate release notes"** to auto-populate a changelog based on merged PRs. Review and edit if necessary.
+   - Click **"Publish release"**.
+
+3. **Post-release**
+   - Once published, the new version will automatically be picked up by [dbt Hub](https://hub.getdbt.com/). No manual publishing steps are required.
+   - Optionally, announce the release in relevant channels (e.g., dbt Slack).
+
+> **Tip:** A well-written PR title = a better changelog. Help your future self and others by being descriptive!
 
 ## Code of Conduct
 
