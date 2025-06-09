@@ -1,14 +1,40 @@
 # Contributing to `dbt-profiler`
 
-When contributing to this repository, please first discuss the change you wish to make via issue,
-email, or any other method with the owners of this repository before making a change. 
+Thanks for your interest in contributing to `dbt-profiler`! We welcome improvements, fixes, and new features from the community. Before you begin, please review this document to understand how we collaborate.
 
-Please note we have a code of conduct, please follow it in all your interactions with the project.
+We ask that you first discuss any significant changes via issue, email, or another form of communication before opening a pull request.
+
+Please also take a moment to review our Code of Conduct and follow it in all interactions with the project and community.
 
 ## Pull Request Process
 
-1. Update the [README.md](README.md) with details of changes to the package, this includes new macros and changes to existing ones.
-2. The Pull Request may be merged after there's a sign-off from at least one maintainer or contributor.
+1. Ensure your pull request includes a descriptive title. Avoid vague titles like “fix adapter bug”; prefer something more specific like “Fix avg calculation in the BigQuery adapter”.
+2. Update the [README.md](README.md) to document any changes to macros or functionality, especially new macros or measures.
+3. Include tests if applicable, and ensure all tests pass.
+4. At least one maintainer must approve the PR before it can be merged.
+
+## Release Process
+
+We follow [Semantic Versioning (semver)](https://semver.org/), using the format `MAJOR.MINOR.PATCH` (e.g., `0.9.0`).
+
+Only maintainers may publish new releases. Here's the process:
+
+1. **Prepare the Release**
+   - Ensure all merged PRs intended for the release have clear and descriptive titles. This improves the quality of the auto-generated release notes.
+   - Confirm that the `README.md` and other relevant documentation are up to date.
+
+2. **Create the Release on GitHub**
+   - Go to the [Releases](https://github.com/<your-org>/dbt-profiler/releases) section of the GitHub repository.
+   - Click **"Draft a new release"**.
+   - Set the **tag version** (e.g., `0.9.0`) and choose the same as the **release title**.
+   - Click **"Generate release notes"** to auto-populate a changelog based on merged PRs. Review and edit if necessary.
+   - Click **"Publish release"**.
+
+3. **Post-release**
+   - Once published, the new version will automatically be picked up by [dbt Hub](https://hub.getdbt.com/). No manual publishing steps are required.
+   - Optionally, announce the release in relevant channels (e.g., dbt Slack).
+
+> **Tip:** A well-written PR title = a better changelog. Help your future self and others by being descriptive!
 
 ## Code of Conduct
 
