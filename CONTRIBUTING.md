@@ -8,10 +8,38 @@ Please also take a moment to review our Code of Conduct and follow it in all int
 
 ## Pull Request Process
 
-1. Ensure your pull request includes a descriptive title. Avoid vague titles like “fix adapter bug”; prefer something more specific like “Fix avg calculation in the BigQuery adapter”.
-2. Update the [README.md](README.md) to document any changes to macros or functionality, especially new macros or measures.
-3. Include tests if applicable, and ensure all tests pass.
-4. At least one maintainer must approve the PR before it can be merged.
+To ensure a smooth development workflow and high-quality contributions, please follow these guidelines when submitting a pull request:
+
+### 1. Branch Naming Convention
+
+Use clear and consistent branch names. Prefix your branch with:
+
+- `feat/` for new features  
+  _Example: `feat/add-skew-measure`_
+- `fix/` for bug fixes  
+  _Example: `fix/avg-calculation-bigquery`_
+
+Note: The GitHub repository is configured to **automatically delete head branches after merge**, so you don’t need to clean up manually.
+
+### 2. CI Checks
+
+Pull requests will trigger a CircleCI pipeline with the following checks:
+
+- ✅ `integration-postgres` – runs automatically on all PRs.
+- 🔒 `integration-bigquery` – requires **explicit approval from a maintainer** in the CircleCI UI before running (due to usage of limited credentials).
+
+Please ensure both checks pass before requesting a review or merging the PR.
+
+### 3. Pull Request Requirements
+
+- Provide a **clear and descriptive title** for your PR.
+  - Avoid vague titles like "fix BigQuery adapter".
+  - Prefer descriptive ones like "Fix avg calculation in the BigQuery adapter".
+- Update the [README.md](README.md) with details of:
+  - New macros
+  - Changes to existing macros or functionality
+- Add or update tests where relevant.
+- Ensure the PR has been reviewed and approved by at least one maintainer before merging.
 
 ## Release Process
 
