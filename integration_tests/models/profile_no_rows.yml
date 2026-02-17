@@ -10,8 +10,8 @@ models:
 
       - name: row_count
         tests:
-          - dbt_expectations.expect_column_values_to_be_in_set:
-              value_set: [0]
+          - dbt_utils.expression_is_true:
+              expression: "= 0"
 
       - name: not_null_proportion
         tests:
@@ -23,8 +23,8 @@ models:
 
       - name: distinct_count
         tests:
-          - dbt_expectations.expect_column_values_to_be_in_set:
-              value_set: [0]
+          - dbt_utils.expression_is_true:
+              expression: "= 0"
 
       - name: is_unique
         tests:
