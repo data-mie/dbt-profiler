@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: profile
+  - name: profile_no_rows
     columns:
       - name: column_name
         tests:
