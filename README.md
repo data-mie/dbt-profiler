@@ -184,8 +184,6 @@ Call this macro from another macro or dbt model:
 
 ## print_profile ([source](macros/print_profile.sql))
 
-❗ **This macro does not work in dbt Cloud. The profile doesn't display in the cloud console log because the underlying [print_table()](https://agate.readthedocs.io/en/1.6.1/api/table.html#agate.Table.print_table) method is disabled.**
-
 This macro prints a relation profile as a Markdown table to `stdout`.
 
 ### Arguments
@@ -342,8 +340,6 @@ This what the profile looks like on the dbt docs site:
 </p>
 
 ## print_profile_docs ([source](macros/print_profile_docs.sql))
-
-❗ **This macro does not work in dbt Cloud. The profile doesn't display in the cloud console log because the underlying [print_table()](https://agate.readthedocs.io/en/1.6.1/api/table.html#agate.Table.print_table) method is disabled.**
 
 This macro prints a relation profile as a Markdown table wrapped in a Jinja `docs` macro to `stdout`.
 

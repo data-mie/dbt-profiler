@@ -3,7 +3,7 @@
 {%- set results = dbt_profiler.get_profile_table(relation=relation, relation_name=relation_name, schema=schema, database=database, exclude_measures=exclude_measures, include_columns=include_columns, exclude_columns=exclude_columns, where_clause=where_clause) -%}
 
 {% if execute %}
-  {% do results.print_table(max_rows=max_rows, max_columns=max_columns, max_column_width=max_column_width, max_precision=max_precision) %}
+  {{ dbt_profiler.print_table(results, max_rows=max_rows, max_columns=max_columns, max_column_width=max_column_width, max_precision=max_precision) }}
 {% endif %}
 
 {% endmacro %}
