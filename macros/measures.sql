@@ -16,7 +16,10 @@ cast(count(*) as {{ dbt.type_bigint() }})
 {%- endmacro -%}
 
 {%- macro default__measure_not_null_proportion(column_name, data_type) -%}
-sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as {{ dbt.type_numeric() }})
+case when cast(count(*) as {{ dbt.type_bigint() }}) > 0 then
+        sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as {{ dbt.type_numeric() }})
+    else cast(null as {{ dbt.type_numeric() }})
+end
 {%- endmacro -%}
 
 
@@ -28,7 +31,10 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 
 {%- macro default__measure_distinct_proportion(column_name, data_type) -%}
 {%- if not dbt_profiler.is_struct_dtype(data_type) -%}
-    count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as {{ dbt.type_numeric() }})
+    case when cast(count(*) as {{ dbt.type_bigint() }}) > 0 then
+            count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as {{ dbt.type_numeric() }})
+        else cast(null as {{ dbt.type_numeric() }})
+    end
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
@@ -56,7 +62,10 @@ sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast
 
 {%- macro default__measure_is_unique(column_name, data_type) -%}
 {%- if not dbt_profiler.is_struct_dtype(data_type) -%}
-    count(distinct {{ adapter.quote(column_name) }}) = count(*)
+    case when cast(count(*) as {{ dbt.type_bigint() }}) > 0 then
+            count(distinct {{ adapter.quote(column_name) }}) = count(*)
+        else null
+        end
 {%- else -%}
     null
 {%- endif -%}
