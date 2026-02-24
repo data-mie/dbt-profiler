@@ -3,8 +3,8 @@ version: 2.1
 jobs:
   integration-postgres:
     docker:
-      - image: cimg/python:3.9.9
-      - image: cimg/postgres:14.0
+      - image: cimg/python:3.11
+      - image: cimg/postgres:16.0
         environment:
           POSTGRES_USER: dbt
           POSTGRES_PASSWORD: dbt
@@ -26,7 +26,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            pip install dbt-postgres
+            pip install "dbt-postgres>=1.1.0,<2.0.0"
             dbt deps
             dbt --version
 
@@ -58,7 +58,7 @@ jobs:
 
   integration-bigquery:
     docker:
-      - image: cimg/python:3.9.9
+      - image: cimg/python:3.11
 
     resource_class: small
 
@@ -74,7 +74,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            pip install dbt-bigquery
+            pip install "dbt-bigquery>=1.1.0,<2.0.0"
             dbt deps
             dbt --version
 
