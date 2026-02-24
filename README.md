@@ -42,7 +42,7 @@
 | Apache Spark | ❌ |
 | Presto | ❌ |
 
-`dbt-profiler` may work with unsupported adapters but they haven't been tested. If you've used `dbt-profiler` with an unsupported adapter, feedback is very welcome — open an issue, a PR, or reach out on [dbt Slack](https://community.getdbt.com/).
+`dbt-profiler` may work with unsupported adapters but they haven't been tested. If you've used `dbt-profiler` with an unsupported adapter, feedback is very welcome: open an issue, a PR, or reach out in the [#tools-dbt-profiler](https://getdbt.slack.com/archives/C094X0V0Y4V) channel on dbt Slack.
 
 ## Quick start
 
@@ -133,7 +133,7 @@ To run only in [execute](https://docs.getdbt.com/reference/dbt-jinja-functions/e
 
 ### get_profile_table ([source](macros/get_profile_table.sql))
 
-Returns a relation profile as an [agate.Table](https://agate.readthedocs.io/en/1.6.1/api/table.html#module-agate.table). Does not print anything to stdout — intended to be called from another macro or model, not as a standalone operation.
+Returns a relation profile as an [agate.Table](https://agate.readthedocs.io/en/1.6.1/api/table.html#module-agate.table). Does not print anything to stdout; intended to be called from another macro or model, not as a standalone operation.
 
 #### Arguments
 
@@ -377,7 +377,7 @@ The `doc` block approach makes it straightforward to keep profiles up to date vi
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. For significant changes, open an issue first to discuss the approach.
 
-You can also reach the maintainers on [dbt Slack](https://community.getdbt.com/).
+You can also reach the maintainers in the [#tools-dbt-profiler](https://getdbt.slack.com/archives/C094X0V0Y4V) channel on dbt Slack.
 
 ## License
 
