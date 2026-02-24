@@ -91,13 +91,53 @@ jobs:
             dbt run --target bigquery
             dbt test --target bigquery
 
+  integration-snowflake:
+    docker:
+      - image: cimg/python:3.11
+
+    resource_class: small
+
+    environment:
+      DBT_PROFILES_DIR: ./
+      SNOWFLAKE_PRIVATE_KEY_PATH: ./snowflake-private-key.p8
+
+    working_directory: ~/repo/integration_tests
+
+    steps:
+      - checkout:
+          path: ~/repo
+      - run:
+          name: Install dependencies
+          command: |
+            pip install "dbt-snowflake>=1.1.0,<2.0.0"
+            dbt deps
+            dbt --version
+
+      - run:
+          name: Test database connection
+          command: |
+            echo "${SNOWFLAKE_PRIVATE_KEY}" > ${SNOWFLAKE_PRIVATE_KEY_PATH}
+            dbt debug --target snowflake
+
+      - run:
+          name: Run tests
+          command: |
+            dbt seed --target snowflake
+            dbt run --target snowflake
+            dbt test --target snowflake
+
 workflows:
   version: 2
   continuous-integration:
     jobs:
       - integration-postgres
-      - approve:
+      - approve-bigquery:
           type: approval
       - integration-bigquery:
           requires:
-            - approve
+            - approve-bigquery
+      - approve-snowflake:
+          type: approval
+      - integration-snowflake:
+          requires:
+            - approve-snowflake
