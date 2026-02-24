@@ -33,7 +33,7 @@
 {%- endmacro -%}
 
 {%- macro sqlserver__is_numeric_dtype(dtype) -%}
-  {% set is_numeric = dtype in ["decimal", "numeric", "bigint" "numeric", "smallint", "decimal", "int", "tinyint", "money", "float", "real"]  %}
+  {% set is_numeric = dtype in ["decimal", "numeric", "bigint", "smallint", "int", "tinyint", "money", "float", "real"]  %}
   {% do return(is_numeric) %}
 {%- endmacro -%}
 

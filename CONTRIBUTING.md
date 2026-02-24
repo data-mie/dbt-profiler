@@ -52,7 +52,7 @@ Only maintainers may publish new releases. Here's the process:
    - Confirm that the `README.md` and other relevant documentation are up to date.
 
 2. **Create the Release on GitHub**
-   - Go to the [Releases](https://github.com/<your-org>/dbt-profiler/releases) section of the GitHub repository.
+   - Go to the [Releases](https://github.com/data-mie/dbt-profiler/releases) section of the GitHub repository.
    - Click **"Draft a new release"**.
    - Set the **tag version** (e.g., `0.9.0`) and choose the same as the **release title**.
    - Click **"Generate release notes"** to auto-populate a changelog based on merged PRs. Review and edit if necessary.
@@ -121,7 +121,7 @@ further defined and clarified by project maintainers.
 ### Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at [INSERT EMAIL ADDRESS]. All
+reported by contacting the project team at simo@datamie.fi. All
 complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
 obligated to maintain confidentiality with regard to the reporter of an incident.
