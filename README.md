@@ -1,157 +1,126 @@
 [![CircleCI](https://circleci.com/gh/data-mie/dbt-profiler/tree/main.svg?style=svg)](https://circleci.com/gh/data-mie/dbt-profiler/tree/main)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![dbt Hub](https://img.shields.io/badge/dbt%20Hub-dbt__profiler-FF694B)](https://hub.getdbt.com/data-mie/dbt_profiler/latest/)
 
 # dbt-profiler
 
-`dbt-profiler` implements dbt macros for profiling database relations and creating  `doc` blocks and table schemas (`schema.yml`) containing said profiles. A calculated profile contains the following measures for each column in a relation:
+> dbt macros for profiling database relations and embedding the results in dbt docs and schema files.
 
-* `column_name`: Name of the column
-* `data_type`: Data type of the column
-* `not_null_proportion`^: Proportion of column values that are not `NULL` (e.g., `0.62` means that 62% of the values are populated while 38% are `NULL`)
-* `distinct_proportion`^: Proportion of unique column values (e.g., `1` means that 100% of the values are unique)
-* `distinct_count`^: Count of unique column values
-* `is_unique`^: True if all column values are unique
-* `min`*^: Minimum column value
-* `max`*^: Maximum column value
-* `avg`**^: Average column value
-* `median`**^: Median column value
-* `std_dev_population`**^: Population standard deviation
-* `std_dev_sample`**^: Sample standard deviation
-* `profiled_at`: Profile calculation date and time
+## Contents
 
-`*` numeric, date and time columns only
-`**` numeric columns only
-`^` can be excluded from the profile using `exclude_measures` argument
-
-## Purpose 
-
-`dbt-profiler` aims to provide the following:
-
-1. [get_profile](#get_profile-source) macro for generating profiling SQL queries that can be used as dbt models or ad-hoc queries
-2. [print_profile](#print_profile-source) macro for ad-hoc model profiling to support data exploration 
-3. Describe a mechanism to include model profiles in [dbt docs](https://docs.getdbt.com/docs/building-a-dbt-project/documentation)
-
-For the third point there are at least two options: 
-
-1. `meta` properties, and 
-2. `doc` blocks. 
-
-An example of the first is implemented in the [print_profile_schema](#print_profile_schema-source) macro. The second can be achieved with the following pattern:
-
-0. Add a `"docs"` folder explicitly to `dbt_project.yml` via [`model-paths`](https://docs.getdbt.com/reference/project-configs/model-paths)
-```
-model-paths: ["models", "docs"]
-```
-1. Use [print_profile_docs](#print_profile_docs-source) macro to generate the profile as a Markdown table wrapped in a Jinja `docs` macro
-2. Copy the output to a `docs/dbt_profiler/<model>.md` file
-```
-# docs/dbt_profiler/customer.md
-{% docs dbt_profiler__customer %}
-
-| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | min        | max        |                 avg |  median |  std_dev_population |      std_dev_sample | profiled_at                   |
-| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ---------- | ---------- | ------------------- | ------- | ------------------- | ------------------- | ----------------------------- |
-| customer_id             | int64     |                1.00 |                1.00 |            100 |         1 | 1          | 100        | 50.5000000000000000 | 50      | 28.8660700477221200 | 29.0114919758820200 | 2022-01-13 10:14:48.300040+00 |
-| first_order             | date      |                0.62 |                0.46 |             46 |         0 | 2018-01-01 | 2018-04-07 |                     |         |                     |                     | 2022-01-13 10:14:48.300040+00 |
-| most_recent_order       | date      |                0.62 |                0.52 |             52 |         0 | 2018-01-09 | 2018-04-09 |                     |         |                     |                     | 2022-01-13 10:14:48.300040+00 |
-| number_of_orders        | int64     |                0.62 |                0.04 |              4 |         0 | 1          | 5          |  1.5967741935483863 | 1       |  0.7716692718648833 |  0.7779687173818426 | 2022-01-13 10:14:48.300040+00 |
-| customer_lifetime_value | float64   |                0.62 |                0.35 |             35 |         0 | 1          | 99         | 26.9677419354838830 | 22      | 18.6599171435558730 | 18.8122455252636630 | 2022-01-13 10:14:48.300040+00 |
-
-{% enddocs %}
-```
-3. Include the profile in a model description using the `doc` macro
-```yml
-version: 2
-
-models:
-  - name: customer
-    description: |
-      Represents a customer.
-      
-      `dbt-profiler` results:
-
-      {{ doc("dbt_profiler__customer") }}
-    columns:
-      - name: customer_id
-        tests:
-          - not_null
-          - unique
-```
-
-### Continuous integration (CI)
-
-One of the advantages of the `doc` approach over the `meta` approach is that it doesn't require changes to the schema.yml except for the `doc` macro call. Once the macro call has been embedded in the schema the actual profiles can be maintained in a dedicated `dbt_profiler/` directory as Markdown files. The profile files can then be automatically updated by a CI process that runs once a week or month as follows:
-
-1. List the models you want to profile (e.g., using `dbt list --output name -m ${node_selection}`)
-2. For each model run `dbt run-operation print_profile_docs --args '{"relation_name": "'${relation_name}'", "schema": "'${schema}'"}'` and store the result in `dbt_profiler/${relation_name}.md`
-  * Note that you need to store the `dbt run-operation print_profile_docs` output in e.g. a variable before piping it to the target file. Piping the output directly to a file (e.g., `dbt run-operation print_profile_docs > ${relation_name}.md`) will result in a situation where the target file is emptied before `dbt run-operation` compiles the dbt project which will throw an error if you're already referring to the `doc` block that the operation has not yet generated. See example [update-relation-profile.sh](update-relation-profile.sh) script.
-
-3. Create a Pull Request for the updated profiles (e.g., using [create-pull-request GitHub Action](https://github.com/peter-evans/create-pull-request))
+- [Installation](#installation)
+- [Supported adapters](#supported-adapters)
+- [Quick start](#quick-start)
+- [Profile measures](#profile-measures)
+- [Macros](#macros)
+  - [get_profile](#get_profile-source)
+  - [get_profile_table](#get_profile_table-source)
+  - [print_profile](#print_profile-source)
+  - [print_profile_schema](#print_profile_schema-source)
+  - [print_profile_docs](#print_profile_docs-source)
+- [Using profiles in dbt docs](#using-profiles-in-dbt-docs)
+- [Automating profile updates with CI](#automating-profile-updates-with-ci)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
-`dbt-profiler` requires dbt version `>=1.1.0`. Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions. 
+`dbt-profiler` requires dbt `>=1.1.0`. Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions.
 
 ## Supported adapters
 
-`dbt-profiler` may work with unsupported adapters but they haven't been tested yet. If you've used `dbt-profiler` with any of the unsupported adapters I'd love to hear your feedback (e.g., create an issue, PR or hit me with with a DM on [dbt Slack](https://community.getdbt.com/)) 😊
+| Adapter | Supported |
+|---|---|
+| AWS Athena | ✅ |
+| BigQuery | ✅ |
+| Databricks | ✅ |
+| PostgreSQL | ✅ |
+| Redshift | ✅ |
+| Snowflake | ✅ |
+| Oracle | ✅ |
+| SQL Server | ✅ |
+| Apache Spark | ❌ |
+| Presto | ❌ |
 
-✅ AWS Athena
+`dbt-profiler` may work with unsupported adapters but they haven't been tested. If you've used `dbt-profiler` with an unsupported adapter, feedback is very welcome — open an issue, a PR, or reach out on [dbt Slack](https://community.getdbt.com/).
 
-✅ BigQuery
+## Quick start
 
-✅ Databricks
+Profile a relation and print the result to stdout:
 
-✅ PostgreSQL
+```bash
+dbt run-operation print_profile --args '{"relation_name": "customers"}'
+```
 
-✅ Redshift
+Use a relation profile as a dbt model:
 
-✅ Snowflake
+```sql
+-- models/customers_profile.sql
+{{ dbt_profiler.get_profile(relation=ref("customers")) }}
+```
 
-✅ Oracle
+Generate a `schema.yml` skeleton with profile data embedded in column `meta` properties:
 
-✅ SQL Server
+```bash
+dbt run-operation print_profile_schema --args '{"relation_name": "customers"}'
+```
 
-❌ Apache Spark
+## Profile measures
 
-❌ Presto
+A calculated profile contains the following measures for each column:
 
+| Measure | Description | Columns |
+|---|---|---|
+| `column_name` | Name of the column | all |
+| `data_type` | Data type of the column | all |
+| `not_null_proportion` † | Proportion of non-`NULL` values (e.g. `0.62` = 62% populated) | all |
+| `distinct_proportion` † | Proportion of unique values | all |
+| `distinct_count` † | Count of unique values | all |
+| `is_unique` † | `true` if all values are unique | all |
+| `min` *† | Minimum value | numeric, date, time |
+| `max` *† | Maximum value | numeric, date, time |
+| `avg` **† | Average value | numeric |
+| `median` **† | Median value | numeric |
+| `std_dev_population` **† | Population standard deviation | numeric |
+| `std_dev_sample` **† | Sample standard deviation | numeric |
+| `profiled_at` | Timestamp when the profile was calculated | all |
 
-# Contents
-* [get_profile](#get_profile-source)
-* [get_profile_table](#get_profile_table-source)
-* [print_profile](#print_profile-source)
-* [print_profile_schema](#print_profile_schema-source)
-* [print_profile_docs](#print_profile_docs-source)
+\* numeric, date and time columns only
+\*\* numeric columns only
+† can be excluded using the `exclude_measures` argument
 
+## Macros
 
-# Macros
+### get_profile ([source](macros/get_profile.sql))
 
-## get_profile ([source](macros/get_profile.sql))
+Returns a relation profile as a SQL query that can be used in a dbt model. Handy for previewing profiles in dbt Cloud.
 
-This macro returns a relation profile as a SQL query that can be used in a dbt model. This is handy for previewing relation profiles in dbt Cloud.
+#### Arguments
 
-### Arguments
-* `relation` (required): [Relation](https://docs.getdbt.com/reference/dbt-classes#relation) object
-* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
-* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `where_clause` (optional): SQL `WHERE` clause to allow exclustion of records from profiler.
-* `group_by` (optional): SQL `group_by` to aggregate data from profiler (default: `[]`)
+| Argument | Required | Default | Description |
+|---|---|---|---|
+| `relation` | yes | | [Relation](https://docs.getdbt.com/reference/dbt-classes#relation) object |
+| `exclude_measures` | no | `[]` | List of measures to exclude from the profile |
+| `include_columns` | no | `[]` (all) | Columns to include. Cannot be used together with `exclude_columns`. |
+| `exclude_columns` | no | `[]` | Columns to exclude. Cannot be used together with `include_columns`. |
+| `where_clause` | no | | SQL `WHERE` clause to filter records before profiling |
+| `group_by` | no | `[]` | SQL `GROUP BY` columns to aggregate data before profiling |
 
-### Usage
+#### Usage
 
-Use this macro in a dbt model, using a [ref()](https://docs.getdbt.com/reference/dbt-jinja-functions/ref):
+Use with [ref()](https://docs.getdbt.com/reference/dbt-jinja-functions/ref):
 
 ```sql
 {{ dbt_profiler.get_profile(relation=ref("customers"), where_clause="is_active = true") }}
 ```
 
-Use this macro in a dbt model, using a [source()](https://docs.getdbt.com/reference/dbt-jinja-functions/source):
+Use with [source()](https://docs.getdbt.com/reference/dbt-jinja-functions/source):
 
 ```sql
 {{ dbt_profiler.get_profile(relation=source("jaffle_shop","customers"), exclude_measures=["std_dev_population", "std_dev_sample"]) }}
 ```
 
-To configure the macro to be called only when dbt is in [execute](https://docs.getdbt.com/reference/dbt-jinja-functions/execute) mode:
+To run only in [execute](https://docs.getdbt.com/reference/dbt-jinja-functions/execute) mode:
 
 ```sql
 -- depends_on: {{ ref("customers") }}
@@ -160,55 +129,63 @@ To configure the macro to be called only when dbt is in [execute](https://docs.g
 {% endif %}
 ```
 
-## get_profile_table ([source](macros/get_profile_table.sql))
+---
 
-This macro returns a relation profile as an [agate.Table](https://agate.readthedocs.io/en/1.6.1/api/table.html#module-agate.table). The macro does not print anything to `stdout` and therefore is not meant to be used as a standalone [operation](https://docs.getdbt.com/docs/using-operations).
+### get_profile_table ([source](macros/get_profile_table.sql))
 
-### Arguments
-* `relation` (either `relation` or `relation_name` is required): Relation object
-* `relation_name` (either `relation` or `relation_name` is required): Relation name
-* `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
-* `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
-* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
-* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `where_clause` (optional): SQL where clause to allow exclustion of records from profiler.  This is done after the `WHERE` keyword.
+Returns a relation profile as an [agate.Table](https://agate.readthedocs.io/en/1.6.1/api/table.html#module-agate.table). Does not print anything to stdout — intended to be called from another macro or model, not as a standalone operation.
 
-### Usage
+#### Arguments
 
-Call this macro from another macro or dbt model:
+| Argument | Required | Default | Description |
+|---|---|---|---|
+| `relation` | either `relation` or `relation_name` | | Relation object |
+| `relation_name` | either `relation` or `relation_name` | | Relation name |
+| `schema` | no | target schema | Schema where `relation_name` exists |
+| `database` | no | target database | Database where `relation_name` exists |
+| `exclude_measures` | no | `[]` | List of measures to exclude from the profile |
+| `include_columns` | no | `[]` (all) | Columns to include. Cannot be used together with `exclude_columns`. |
+| `exclude_columns` | no | `[]` | Columns to exclude. Cannot be used together with `include_columns`. |
+| `where_clause` | no | | SQL `WHERE` clause to filter records before profiling |
+
+#### Usage
 
 ```sql
 {% set table = dbt_profiler.get_profile_table(relation_name="customers") %}
 ```
 
-## print_profile ([source](macros/print_profile.sql))
+---
 
-❗ **This macro does not work in dbt Cloud. The profile doesn't display in the cloud console log because the underlying [print_table()](https://agate.readthedocs.io/en/1.6.1/api/table.html#agate.Table.print_table) method is disabled.**
+### print_profile ([source](macros/print_profile.sql))
 
-This macro prints a relation profile as a Markdown table to `stdout`.
+> ❗ **Does not work in dbt Cloud.** The profile doesn't display in the cloud console log because the underlying [print_table()](https://agate.readthedocs.io/en/1.6.1/api/table.html#agate.Table.print_table) method is disabled.
 
-### Arguments
-* `relation` (either `relation` or `relation_name` is required): Relation object
-* `relation_name` (either `relation` or `relation_name` is required): Relation name
-* `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
-* `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
-* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
-* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
-* `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
-* `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
-* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: `none` i.e., not limited)
-* `where_clause` (optional): SQL where clause to allow exclustion of records from profiler.  This is done after the `WHERE` keyword.
+Prints a relation profile as a Markdown table to stdout.
 
-### Usage
-Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+#### Arguments
+
+| Argument | Required | Default | Description |
+|---|---|---|---|
+| `relation` | either `relation` or `relation_name` | | Relation object |
+| `relation_name` | either `relation` or `relation_name` | | Relation name |
+| `schema` | no | target schema | Schema where `relation_name` exists |
+| `database` | no | target database | Database where `relation_name` exists |
+| `exclude_measures` | no | `[]` | List of measures to exclude from the profile |
+| `include_columns` | no | `[]` (all) | Columns to include. Cannot be used together with `exclude_columns`. |
+| `exclude_columns` | no | `[]` | Columns to exclude. Cannot be used together with `include_columns`. |
+| `max_rows` | no | none (not truncated) | Maximum number of rows to display |
+| `max_columns` | no | `7` | Maximum number of columns to display |
+| `max_column_width` | no | `30` | Truncate all columns to at most this width |
+| `max_precision` | no | none (not limited) | Maximum precision for number types |
+| `where_clause` | no | | SQL `WHERE` clause to filter records before profiling |
+
+#### Usage
+
 ```bash
 dbt run-operation print_profile --args '{"relation_name": "customers"}'
 ```
 
-An alternative for dbt Cloud that prints the profile in the console log but not in a Markdown format:
+For dbt Cloud, an alternative that logs to the console (without Markdown formatting):
 
 ```sql
 {% set profile = dbt_profiler.get_profile(relation=ref("customers")) %}
@@ -217,40 +194,44 @@ An alternative for dbt Cloud that prints the profile in the console log but not 
 {% endfor %}
 ```
 
-### Example output
+#### Example output
 
-| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | min        | max        |                 avg |  std_dev_population |      std_dev_sample | profiled_at                   |
-| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ---------- | ---------- | ------------------- | ------------------- | ------------------- | ----------------------------- |
-| customer_id             | int64     |                1.00 |                1.00 |            100 |         1 | 1          | 100        | 50.5000000000000000 | 28.8660700477221200 | 29.0114919758820200 | 2022-01-13 10:14:48.300040+00 |
-| first_order             | date      |                0.62 |                0.46 |             46 |         0 | 2018-01-01 | 2018-04-07 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
-| most_recent_order       | date      |                0.62 |                0.52 |             52 |         0 | 2018-01-09 | 2018-04-09 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
-| number_of_orders        | int64     |                0.62 |                0.04 |              4 |         0 | 1          | 5          |  1.5967741935483863 |  0.7716692718648833 |  0.7779687173818426 | 2022-01-13 10:14:48.300040+00 |
-| customer_lifetime_value | float64   |                0.62 |                0.35 |             35 |         0 | 1          | 99         | 26.9677419354838830 | 18.6599171435558730 | 18.8122455252636630 | 2022-01-13 10:14:48.300040+00 |
+| column_name | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | min | max | avg | std_dev_population | std_dev_sample | profiled_at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| customer_id | int64 | 1.00 | 1.00 | 100 | 1 | 1 | 100 | 50.50 | 28.87 | 29.01 | 2022-01-13 10:14:48+00 |
+| first_order | date | 0.62 | 0.46 | 46 | 0 | 2018-01-01 | 2018-04-07 | | | | 2022-01-13 10:14:48+00 |
+| most_recent_order | date | 0.62 | 0.52 | 52 | 0 | 2018-01-09 | 2018-04-09 | | | | 2022-01-13 10:14:48+00 |
+| number_of_orders | int64 | 0.62 | 0.04 | 4 | 0 | 1 | 5 | 1.60 | 0.77 | 0.78 | 2022-01-13 10:14:48+00 |
+| customer_lifetime_value | float64 | 0.62 | 0.35 | 35 | 0 | 1 | 99 | 26.97 | 18.66 | 18.81 | 2022-01-13 10:14:48+00 |
 
+---
 
-## print_profile_schema ([source](macros/print_profile_schema.sql))
+### print_profile_schema ([source](macros/print_profile_schema.sql))
 
-This macro prints a relation schema YAML to `stdout` containing all columns and their profiles.
+Prints a `schema.yml` to stdout with all columns and their profile data embedded as `meta` properties.
 
-### Arguments
-* `relation` (either `relation` or `relation_name` is required): Relation object
-* `relation_name` (either `relation` or `relation_name` is required): Relation name
-* `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
-* `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
-* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
-* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `model_description` (optional): Model description included in the schema (default: `""`)
-* `column_description` (optional): Column descriptions included in the schema (default: `""`)
-* `where_clause` (optional): SQL where clause to allow exclustion of records from profiler.  This is done after the `WHERE` keyword.
+#### Arguments
 
-### Usage
-Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+| Argument | Required | Default | Description |
+|---|---|---|---|
+| `relation` | either `relation` or `relation_name` | | Relation object |
+| `relation_name` | either `relation` or `relation_name` | | Relation name |
+| `schema` | no | target schema | Schema where `relation_name` exists |
+| `database` | no | target database | Database where `relation_name` exists |
+| `exclude_measures` | no | `[]` | List of measures to exclude from the profile |
+| `include_columns` | no | `[]` (all) | Columns to include. Cannot be used together with `exclude_columns`. |
+| `exclude_columns` | no | `[]` | Columns to exclude. Cannot be used together with `include_columns`. |
+| `model_description` | no | `""` | Model description to include in the schema |
+| `column_description` | no | `""` | Column description to include for each column |
+| `where_clause` | no | | SQL `WHERE` clause to filter records before profiling |
+
+#### Usage
+
 ```bash
 dbt run-operation print_profile_schema --args '{"relation_name": "customers"}'
 ```
 
-### Example output
+#### Example output
 
 ```yaml
 version: 2
@@ -258,36 +239,6 @@ models:
 - name: customers
   description: ''
   columns:
-  - name: number_of_orders
-    description: ''
-    meta:
-      data_type: int64
-      row_count: 100.0
-      not_null_proportion: 0.62
-      distinct_proportion: 0.04
-      distinct_count: 4.0
-      is_unique: 0.0
-      min: '1'
-      max: '5'
-      avg: 1.5967741935483863
-      std_dev_population: 0.7716692718648833
-      std_dev_sample: 0.7779687173818426
-      profiled_at: '2022-01-13 10:08:18.446822+00'
-  - name: customer_lifetime_value
-    description: ''
-    meta:
-      data_type: float64
-      row_count: 100.0
-      not_null_proportion: 0.62
-      distinct_proportion: 0.35
-      distinct_count: 35.0
-      is_unique: 0.0
-      min: '1'
-      max: '99'
-      avg: 26.967741935483883
-      std_dev_population: 18.659917143555873
-      std_dev_sample: 18.812245525263663
-      profiled_at: '2022-01-13 10:08:18.446822+00'
   - name: customer_id
     description: ''
     meta:
@@ -318,76 +269,116 @@ models:
       std_dev_population: null
       std_dev_sample: null
       profiled_at: '2022-01-13 10:08:18.446822+00'
-  - name: most_recent_order
-    description: ''
-    meta:
-      data_type: date
-      row_count: 100.0
-      not_null_proportion: 0.62
-      distinct_proportion: 0.52
-      distinct_count: 52.0
-      is_unique: 0.0
-      min: '2018-01-09'
-      max: '2018-04-09'
-      avg: null
-      std_dev_population: null
-      std_dev_sample: null
-      profiled_at: '2022-01-13 10:08:18.446822+00'
+  # ... remaining columns
 ```
 
-This what the profile looks like on the dbt docs site:
+This is what the profile looks like in the dbt docs UI:
 
 <p align="center">
- <img src=".github/dbt_docs_example.png" alt="dbt docs example"/>
+  <img src=".github/dbt_docs_example.png" alt="dbt docs example"/>
 </p>
 
-## print_profile_docs ([source](macros/print_profile_docs.sql))
+---
 
-❗ **This macro does not work in dbt Cloud. The profile doesn't display in the cloud console log because the underlying [print_table()](https://agate.readthedocs.io/en/1.6.1/api/table.html#agate.Table.print_table) method is disabled.**
+### print_profile_docs ([source](macros/print_profile_docs.sql))
 
-This macro prints a relation profile as a Markdown table wrapped in a Jinja `docs` macro to `stdout`.
+> ❗ **Does not work in dbt Cloud.** The profile doesn't display in the cloud console log because the underlying [print_table()](https://agate.readthedocs.io/en/1.6.1/api/table.html#agate.Table.print_table) method is disabled.
 
-### Arguments
-* `relation` (either `relation` or `relation_name` is required): Relation object
-* `relation_name` (either `relation` or `relation_name` is required): Relation name
-* `schema` (optional): Schema where `relation_name` exists (default: `none` i.e., target schema)
-* `database` (optional): Database where `relation_name` exists (default: `none` i.e., target database)
-* `exclude_measures` (optional): List of measures to exclude from the profile (default: `[]`)
-* `include_columns` (optional): List of columns to include in the profile (default: `[]` i.e., all). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `exclude_columns` (optional): List of columns to exclude from the profile (default: `[]`). Only one of `include_columns` and `exclude_columns` can be specified at a time.
-* `docs_name` (optional): `docs` macro name (default: `dbt_profiler__{{ relation_name }}`)
-* `max_rows` (optional): The maximum number of rows to display before truncating the data (default: `none` i.e., not truncated)
-* `max_columns` (optional): The maximum number of columns to display before truncating the data (default: `7`)
-* `max_column_width` (optional): Truncate all columns to at most this width (default: `30`)
-* `max_precision` (optional): Puts a limit on the maximum precision displayed for number types (default: `none` i.e., not limited)
-* `where_clause` (optional): SQL where clause to allow exclustion of records from profiler.  This is done after the `WHERE` keyword.
+Prints a relation profile as a Markdown table wrapped in a Jinja `docs` block to stdout. Intended to be used as part of the [dbt docs workflow](#using-profiles-in-dbt-docs).
 
+#### Arguments
 
-### Usage
-Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+| Argument | Required | Default | Description |
+|---|---|---|---|
+| `relation` | either `relation` or `relation_name` | | Relation object |
+| `relation_name` | either `relation` or `relation_name` | | Relation name |
+| `schema` | no | target schema | Schema where `relation_name` exists |
+| `database` | no | target database | Database where `relation_name` exists |
+| `exclude_measures` | no | `[]` | List of measures to exclude from the profile |
+| `include_columns` | no | `[]` (all) | Columns to include. Cannot be used together with `exclude_columns`. |
+| `exclude_columns` | no | `[]` | Columns to exclude. Cannot be used together with `include_columns`. |
+| `docs_name` | no | `dbt_profiler__{{ relation_name }}` | Name of the generated `docs` block |
+| `max_rows` | no | none (not truncated) | Maximum number of rows to display |
+| `max_columns` | no | `7` | Maximum number of columns to display |
+| `max_column_width` | no | `30` | Truncate all columns to at most this width |
+| `max_precision` | no | none (not limited) | Maximum precision for number types |
+| `where_clause` | no | | SQL `WHERE` clause to filter records before profiling |
+
+#### Usage
+
 ```bash
 dbt run-operation print_profile_docs --args '{"relation_name": "customers"}'
 ```
 
-### Example output
+#### Example output
 
 ```
-{% docs dbt_profiler__customers  %}
-| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | min        | max        |                 avg |  std_dev_population |      std_dev_sample | profiled_at                   |
-| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ---------- | ---------- | ------------------- | ------------------- | ------------------- | ----------------------------- |
-| customer_id             | int64     |                1.00 |                1.00 |            100 |         1 | 1          | 100        | 50.5000000000000000 | 28.8660700477221200 | 29.0114919758820200 | 2022-01-13 10:14:48.300040+00 |
-| first_order             | date      |                0.62 |                0.46 |             46 |         0 | 2018-01-01 | 2018-04-07 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
-| most_recent_order       | date      |                0.62 |                0.52 |             52 |         0 | 2018-01-09 | 2018-04-09 |                     |                     |                     | 2022-01-13 10:14:48.300040+00 |
-| number_of_orders        | int64     |                0.62 |                0.04 |              4 |         0 | 1          | 5          |  1.5967741935483863 |  0.7716692718648833 |  0.7779687173818426 | 2022-01-13 10:14:48.300040+00 |
-| customer_lifetime_value | float64   |                0.62 |                0.35 |             35 |         0 | 1          | 99         | 26.9677419354838830 | 18.6599171435558730 | 18.8122455252636630 | 2022-01-13 10:14:48.300040+00 |
+{% docs dbt_profiler__customers %}
+| column_name             | data_type | not_null_proportion | distinct_proportion | distinct_count | is_unique | min        | max        |
+| ----------------------- | --------- | ------------------- | ------------------- | -------------- | --------- | ---------- | ---------- |
+| customer_id             | int64     |                1.00 |                1.00 |            100 |         1 | 1          | 100        |
+| first_order             | date      |                0.62 |                0.46 |             46 |         0 | 2018-01-01 | 2018-04-07 |
+| most_recent_order       | date      |                0.62 |                0.52 |             52 |         0 | 2018-01-09 | 2018-04-09 |
+| number_of_orders        | int64     |                0.62 |                0.04 |              4 |         0 | 1          | 5          |
+| customer_lifetime_value | float64   |                0.62 |                0.35 |             35 |         0 | 1          | 99         |
 {% enddocs %}
 ```
 
-### Contributions
+## Using profiles in dbt docs
 
-#### [mdutoo](https://github.com/mdutoo): Added date type to tests, fix [#37](https://github.com/data-mie/dbt-profiler/issues/37) Error when profiling integer after date after string columns
+There are two ways to embed profiles in dbt docs: via `meta` properties (see [print_profile_schema](#print_profile_schema-source)) or via `doc` blocks. The `doc` block approach is recommended because it keeps profile data out of `schema.yml` and lets profiles be updated independently.
 
-Profiling a table whose column are integer, date, string in this order raises the following error :
-ERROR:  UNION types text and numeric cannot be matched
-LINE 60:           avg("int_after_date_after_string") as avg,
-Appropriately casting the null default value solves it.
+### Setup
+
+**1.** Add a `docs` folder to `dbt_project.yml`:
+
+```yaml
+model-paths: ["models", "docs"]
+```
+
+**2.** Run `print_profile_docs` and save the output to a file:
+
+```bash
+# docs/dbt_profiler/customers.md
+dbt run-operation print_profile_docs --args '{"relation_name": "customers"}'
+```
+
+> Note: store the output in a variable before redirecting to a file. Piping directly (e.g. `dbt run-operation ... > customers.md`) will empty the file before dbt compiles the project, causing an error if the `doc` block is already referenced. See the example [update-relation-profile.sh](update-relation-profile.sh) script.
+
+**3.** Reference the `doc` block in your model description:
+
+```yaml
+version: 2
+
+models:
+  - name: customers
+    description: |
+      Represents a customer.
+
+      `dbt-profiler` results:
+
+      {{ doc("dbt_profiler__customers") }}
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+```
+
+## Automating profile updates with CI
+
+The `doc` block approach makes it straightforward to keep profiles up to date via a scheduled CI job:
+
+1. List the models to profile (e.g. `dbt list --output name -m ${node_selection}`)
+2. For each model, run `print_profile_docs` and write the output to `docs/dbt_profiler/${relation_name}.md`
+3. Open a pull request for the updated profiles (e.g. using the [create-pull-request](https://github.com/peter-evans/create-pull-request) GitHub Action)
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. For significant changes, open an issue first to discuss the approach.
+
+You can also reach the maintainers on [dbt Slack](https://community.getdbt.com/).
+
+## License
+
+[Apache License 2.0](LICENSE)
