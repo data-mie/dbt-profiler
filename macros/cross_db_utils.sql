@@ -8,6 +8,10 @@
   varchar
 {%- endmacro -%}
 
+{%- macro oracle__type_string() -%}
+  varchar(1000)
+{%- endmacro -%}
+
 {%- macro bigquery__type_string() -%}
   string
 {%- endmacro -%}
@@ -80,6 +84,10 @@
   {{ relation.information_schema() }}
 {%- endmacro -%}
 
+{%- macro oracle__information_schema(relation) -%}
+  ALL_TAB_COLUMNS
+{%- endmacro -%}
+
 {%- macro bigquery__information_schema(relation) -%}
   {{ adapter.quote(relation.database) }}.{{ adapter.quote(relation.schema) }}.INFORMATION_SCHEMA
 {%- endmacro -%}
@@ -98,6 +106,15 @@
   where lower(table_schema) = lower('{{ relation.schema }}') 
     and lower(table_name) = lower('{{ relation.identifier }}')
   order by ordinal_position asc
+{%- endmacro -%}
+
+{%- macro oracle__select_from_information_schema_columns(relation) -%}
+  select
+    *
+  from {{ dbt_profiler.information_schema(relation) }}
+  where lower(owner) = lower('{{ relation.schema }}') 
+    and lower(table_name) = lower('{{ relation.identifier }}')
+  order by column_id asc
 {%- endmacro -%}
 
 {%- macro redshift__select_from_information_schema_columns(relation) -%}
