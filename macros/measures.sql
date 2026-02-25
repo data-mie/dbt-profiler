@@ -221,7 +221,17 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- macro sqlserver__measure_median(column_name, data_type, cte_name) -%}
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    (select percentile_cont(0.5) within group (order by {{ adapter.quote(column_name) }}) from {{ cte_name }})
+    (
+        select avg(cast({{ adapter.quote(column_name) }} as float))
+        from (
+            select {{ adapter.quote(column_name) }},
+                   row_number() over (order by {{ adapter.quote(column_name) }}) as rn,
+                   count(*) over () as cnt
+            from {{ cte_name }}
+            where {{ adapter.quote(column_name) }} is not null
+        ) t
+        where rn in (floor((cnt + 1) / 2.0), ceiling((cnt + 1) / 2.0))
+    )
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
