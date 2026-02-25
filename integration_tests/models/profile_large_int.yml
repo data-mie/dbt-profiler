@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: profile_large_int
+    description: >
+      Regression test for SQL Server error 8115 "Value overflow in a SUM aggregate"
+      when computing stdev on large integer (hash-based surrogate key) columns.
+    columns:
+      - name: column_name
+        tests:
+          - not_null
+          - unique
+
+      - name: data_type
+        tests:
+          - not_null
+
+      - name: row_count
+        tests:
+          - not_null
+
+      - name: std_dev_population
+        tests:
+          - not_null:
+              where: column_name = 'hash_key'
+
+      - name: std_dev_sample
+        tests:
+          - not_null:
+              where: column_name = 'hash_key'
+
+      - name: avg
+        tests:
+          - not_null:
+              where: column_name = 'hash_key'
+
+      - name: median
+        tests:
+          - not_null:
+              where: column_name = 'hash_key'
