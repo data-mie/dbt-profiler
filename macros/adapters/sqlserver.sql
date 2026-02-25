@@ -55,7 +55,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- macro sqlserver__measure_std_dev_population(column_name, data_type) -%}
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) -%}
-    stdevp({{ adapter.quote(column_name) }})
+    stdevp(cast({{ adapter.quote(column_name) }} as float))
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
@@ -66,7 +66,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- macro sqlserver__measure_std_dev_sample(column_name, data_type) -%}
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) -%}
-    stdev({{ adapter.quote(column_name) }})
+    stdev(cast({{ adapter.quote(column_name) }} as float))
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
