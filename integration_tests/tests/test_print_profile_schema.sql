@@ -1,3 +1,4 @@
+{{ config(depends_on=["ref('test_data_default')"]) }}
 {% if execute %}
 
   {% set schema_dict = dbt_profiler.print_profile_schema(relation_name="test_data_default") %}
