@@ -15,12 +15,12 @@
 
   {{ log("Get relation %s (database=%s, schema=%s)" | format(adapter.quote(relation_name), adapter.quote(database), adapter.quote(schema)), info=False) }}
 
-  {%- 
+  {%-
   set relation = adapter.get_relation(
     database=database,
     schema=schema,
     identifier=relation_name
-  ) 
+  )
   -%}
   {% if relation is none %}
     {{ exceptions.raise_compiler_error("Relation " ~ adapter.quote(relation_name) ~ " does not exist or not authorized.") }}
@@ -31,6 +31,7 @@
 
 {% endmacro %}
 
+
 {%- macro assert_relation_exists(relation) -%}
   {{ return(adapter.dispatch("assert_relation_exists", macro_namespace="dbt_profiler")(relation)) }}
 {%- endmacro -%}
@@ -38,17 +39,5 @@
 {% macro default__assert_relation_exists(relation) %}
 
 {% do run_query("select * from " ~ relation ~ " limit 0") %}
-
-{% endmacro %}
-
-{% macro sqlserver__assert_relation_exists(relation) %}
-
-{% do run_query("select top(0) * from " ~ relation ~ "") %}
-
-{% endmacro %}
-
-{% macro oracle__assert_relation_exists(relation) %}
-
-{% do run_query("select * from " ~ relation ~ " where rownum < 0") %}
 
 {% endmacro %}

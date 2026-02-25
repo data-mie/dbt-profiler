@@ -1,9 +1,87 @@
-{% macro get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
-  {{ return(adapter.dispatch("get_profile", macro_namespace="dbt_profiler")(relation, exclude_measures, include_columns, exclude_columns, where_clause, group_by)) }}
+{# SQL Server adapter overrides  -------------------------------------------------     #}
+
+
+{%- macro sqlserver__is_numeric_dtype(dtype) -%}
+  {% set is_numeric = dtype in ["decimal", "numeric", "bigint", "smallint", "int", "tinyint", "money", "float", "real"]  %}
+  {% do return(is_numeric) %}
+{%- endmacro -%}
+
+
+{%- macro sqlserver__is_logical_dtype(dtype) -%}
+  {% set is_bool = dtype == "bit" %}
+  {% do return(is_bool) %}
+{%- endmacro -%}
+
+
+{%- macro sqlserver__measure_is_unique(column_name, data_type) -%}
+case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 else 0 end
+{%- endmacro -%}
+
+
+{%- macro sqlserver__measure_avg(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    avg(cast({{ adapter.quote(column_name) }} as float))
+{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
+    avg(cast(case when {{ adapter.quote(column_name) }} = 1 then 1.0 else 0.0 end as float))
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro sqlserver__measure_median(column_name, data_type, cte_name) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    (
+        select avg(cast({{ adapter.quote(column_name) }} as float))
+        from (
+            select {{ adapter.quote(column_name) }},
+                   row_number() over (order by {{ adapter.quote(column_name) }}) as rn,
+                   count(*) over () as cnt
+            from {{ cte_name }}
+            where {{ adapter.quote(column_name) }} is not null
+        ) t
+        where rn in (floor((cnt + 1) / 2.0), ceiling((cnt + 1) / 2.0))
+    )
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro sqlserver__measure_std_dev_population(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
+    stdevp({{ adapter.quote(column_name) }})
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro sqlserver__measure_std_dev_sample(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
+    stdev({{ adapter.quote(column_name) }})
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
+
+{% macro sqlserver__assert_relation_exists(relation) %}
+
+{% do run_query("select top(0) * from " ~ relation ~ "") %}
+
 {% endmacro %}
 
 
-{% macro default__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
+{% macro sqlserver__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -117,7 +195,7 @@
       {% endfor %}
     )
 
-    select
+    select top 100 percent
       {%- for group_by_column in group_by %}
         {{ group_by_column }},
       {%- endfor %}

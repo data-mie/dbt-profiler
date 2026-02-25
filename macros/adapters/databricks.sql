@@ -1,9 +1,12 @@
-{% macro get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
-  {{ return(adapter.dispatch("get_profile", macro_namespace="dbt_profiler")(relation, exclude_measures, include_columns, exclude_columns, where_clause, group_by)) }}
-{% endmacro %}
+{# Databricks adapter overrides  -------------------------------------------------     #}
 
 
-{% macro default__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
+{%- macro databricks__type_string() -%}
+  string
+{%- endmacro -%}
+
+
+{% macro databricks__get_profile(relation, exclude_measures=[], include_columns=[], exclude_columns=[], where_clause=none, group_by=[]) %}
 
 {%- if include_columns and exclude_columns -%}
     {{ exceptions.raise_compiler_error("Both include_columns and exclude_columns arguments were provided to the `get_profile` macro. Only one is allowed.") }}
@@ -30,7 +33,7 @@
 {% if execute %}
   {% do dbt_profiler.assert_relation_exists(relation) %}
 
-  {{ log("Get columns in relation %s" | format(relation.include()), info=False) }}
+  {{ log("Get columns in relation %s" | format(relation.include()), info=True) }}
   {%- set relation_columns = adapter.get_columns_in_relation(relation) -%}
   {%- set relation_column_names = relation_columns | map(attribute="name") | list -%}
   {{ log("Relation columns: " ~ relation_column_names | join(', '), info=False) }}
@@ -45,13 +48,18 @@
 
   {{ log("Profile columns: " ~ profile_column_names | join(', '), info=False) }}
 
-  {% set information_schema_columns = run_query(dbt_profiler.select_from_information_schema_columns(relation)) %}
-  {% set information_schema_columns = information_schema_columns.rename(information_schema_columns.column_names | map('lower')) %}
-  {% set information_schema_data_types = information_schema_columns.columns['data_type'].values() | map('lower') | list %}
-  {% set information_schema_column_names = information_schema_columns.columns['column_name'].values() | map('lower') | list %}
+  {# Get column metadata. #}
+  {% call statement('table_metadata', fetch_result=True) -%}
+    describe table extended {{ relation.schema }}.{{ relation.identifier }}
+  {% endcall %}
+  {% set columns_metadata = load_result('table_metadata').table %}
+  {% set columns_metadata = columns_metadata.rename(columns_metadata.column_names | map('lower')) %}
+
+  {% set data_types = columns_metadata.columns['data_type'].values() | map('lower') | list %}
+  {% set column_names = columns_metadata.columns['col_name'].values() | map('lower') | list %}
   {% set data_type_map = {} %}
-  {% for column_name in information_schema_column_names %}
-    {% do data_type_map.update({column_name: information_schema_data_types[loop.index-1]}) %}
+  {% for column_name in column_names %}
+    {% do data_type_map.update({column_name: data_types[loop.index-1]}) %}
   {% endfor %}
   {{ log("Column data types: " ~ data_type_map, info=False) }}
 

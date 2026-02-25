@@ -8,18 +8,6 @@
   varchar
 {%- endmacro -%}
 
-{%- macro oracle__type_string() -%}
-  varchar(1000)
-{%- endmacro -%}
-
-{%- macro bigquery__type_string() -%}
-  string
-{%- endmacro -%}
-
-{%- macro databricks__type_string() -%}
-  string
-{%- endmacro -%}
-
 
 {# is_numeric_dtype  -------------------------------------------------     #}
 
@@ -32,15 +20,6 @@
   {% do return(is_numeric) %}
 {%- endmacro -%}
 
-{%- macro sqlserver__is_numeric_dtype(dtype) -%}
-  {% set is_numeric = dtype in ["decimal", "numeric", "bigint", "smallint", "int", "tinyint", "money", "float", "real"]  %}
-  {% do return(is_numeric) %}
-{%- endmacro -%}
-
-{%- macro athena__is_numeric_dtype(dtype) -%}
-  {% set is_numeric = "int" in dtype or "float" in dtype or "decimal" in dtype or "double" in dtype %}
-  {% do return(is_numeric) %}
-{%- endmacro -%}
 
 {# is_logical_dtype  -------------------------------------------------     #}
 
@@ -53,10 +32,6 @@
   {% do return(is_bool) %}
 {%- endmacro -%}
 
-{%- macro sqlserver__is_logical_dtype(dtype) -%}
-  {% set is_bool = dtype == "bit" %}
-  {% do return(is_bool) %}
-{%- endmacro -%}
 
 {# is_date_or_time_dtype  -------------------------------------------------     #}
 
@@ -69,6 +44,7 @@
   {% do return(is_date_or_time) %}
 {%- endmacro -%}
 
+
 {# is_struct_dtype  -------------------------------------------------     #}
 
 {%- macro is_struct_dtype(dtype) -%}
@@ -79,6 +55,7 @@
   {% do return((dtype | lower).startswith('struct')) %}
 {%- endmacro -%}
 
+
 {# information_schema  -------------------------------------------------     #}
 
 {%- macro information_schema(relation) -%}
@@ -87,14 +64,6 @@
 
 {%- macro default__information_schema(relation) -%}
   {{ relation.information_schema() }}
-{%- endmacro -%}
-
-{%- macro oracle__information_schema(relation) -%}
-  ALL_TAB_COLUMNS
-{%- endmacro -%}
-
-{%- macro bigquery__information_schema(relation) -%}
-  {{ adapter.quote(relation.database) }}.{{ adapter.quote(relation.schema) }}.INFORMATION_SCHEMA
 {%- endmacro -%}
 
 
@@ -108,31 +77,7 @@
   select
     *
   from {{ dbt_profiler.information_schema(relation) }}.COLUMNS
-  where lower(table_schema) = lower('{{ relation.schema }}') 
+  where lower(table_schema) = lower('{{ relation.schema }}')
     and lower(table_name) = lower('{{ relation.identifier }}')
   order by ordinal_position asc
-{%- endmacro -%}
-
-{%- macro oracle__select_from_information_schema_columns(relation) -%}
-  select
-    *
-  from {{ dbt_profiler.information_schema(relation) }}
-  where lower(owner) = lower('{{ relation.schema }}') 
-    and lower(table_name) = lower('{{ relation.identifier }}')
-  order by column_id asc
-{%- endmacro -%}
-
-{%- macro redshift__select_from_information_schema_columns(relation) -%}
-  select
-    attr.attname::varchar as column_name,
-    type.typname::varchar as data_type,
-    class.relname::varchar as table_name,
-    namespace.nspname::varchar as table_schema
-  from pg_catalog.pg_attribute as attr
-  join pg_catalog.pg_type as type on (attr.atttypid = type.oid)
-  join pg_catalog.pg_class as class on (attr.attrelid = class.oid)
-  join pg_catalog.pg_namespace as namespace on (class.relnamespace = namespace.oid)
-  where lower(table_schema) = lower('{{ relation.schema }}') 
-    and lower(table_name) = lower('{{ relation.identifier }}')
-    and attr.attnum > 0
 {%- endmacro -%}
