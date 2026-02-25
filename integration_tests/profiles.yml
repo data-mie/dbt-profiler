@@ -25,3 +25,13 @@ integration_tests:
       timeout_seconds: 300
       priority: interactive
       retries: 1
+    snowflake:
+      type: snowflake
+      account: '{{ env_var("SNOWFLAKE_ACCOUNT") }}'
+      user: '{{ env_var("SNOWFLAKE_USER") }}'
+      private_key_path: '{{ env_var("SNOWFLAKE_PRIVATE_KEY_PATH") }}'
+      role: '{{ env_var("SNOWFLAKE_ROLE") }}'
+      database: '{{ env_var("SNOWFLAKE_DATABASE") }}'
+      warehouse: '{{ env_var("SNOWFLAKE_WAREHOUSE") }}'
+      schema: dbt_profiler_integration_tests_snowflake
+      threads: 4
