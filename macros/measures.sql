@@ -8,9 +8,6 @@
 cast(count(*) as {{ dbt.type_bigint() }})
 {%- endmacro -%}
 
-{%- macro oracle__measure_row_count(column_name, data_type) -%}
-cast(count(*) as {{ dbt.type_numeric() }})
-{%- endmacro -%}
 
 {# measure_not_null_proportion  -------------------------------------------------     #}
 
@@ -25,11 +22,6 @@ case when cast(count(*) as {{ dbt.type_bigint() }}) > 0 then
 end
 {%- endmacro -%}
 
-{%- macro oracle__measure_not_null_proportion(column_name, data_type) -%}
-case when cast(count(*) as {{ dbt.type_numeric() }}) != 0 THEN 
-sum(case when {{ adapter.quote(column_name) }} is null then 0 else 1 end) / cast(count(*) as {{ dbt.type_numeric() }})
-ELSE 0 END
-{%- endmacro -%}
 
 {# measure_distinct_proportion  -------------------------------------------------     #}
 
@@ -48,15 +40,6 @@ ELSE 0 END
 {%- endif -%}
 {%- endmacro -%}
 
-{%- macro oracle__measure_distinct_proportion(column_name, data_type) -%}
-{%- if not dbt_profiler.is_struct_dtype(data_type) -%}
-	CASE WHEN cast(count(*) as {{ dbt.type_numeric() }}) != 0 THEN 
-    count(distinct {{ adapter.quote(column_name) }}) / cast(count(*) as {{ dbt.type_numeric() }})
-	ELSE 0 END
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-{%- endmacro -%}
 
 {# measure_distinct_count  -------------------------------------------------     #}
 
@@ -71,6 +54,7 @@ ELSE 0 END
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}
 {%- endmacro -%}
+
 
 {# measure_is_unique  -------------------------------------------------     #}
 
@@ -89,18 +73,6 @@ ELSE 0 END
 {%- endif -%}
 {%- endmacro -%}
 
-{%- macro oracle__measure_is_unique(column_name, data_type) -%}
-{%- if not dbt_profiler.is_struct_dtype(data_type) -%}
-    CASE WHEN count(distinct {{ adapter.quote(column_name) }}) = count(*) THEN 'Y' ELSE 'N' END
-{%- else -%}
-    null
-{%- endif -%}
-{%- endmacro -%}
-
-{%- macro sqlserver__measure_is_unique(column_name, data_type) -%}
-case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 else 0 end
-{%- endmacro -%}
-
 
 {# measure_min  -------------------------------------------------     #}
 
@@ -115,6 +87,7 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
     cast(null as {{ dbt_profiler.type_string() }})
 {%- endif -%}
 {%- endmacro -%}
+
 
 {# measure_max  -------------------------------------------------     #}
 
@@ -150,30 +123,6 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- endmacro -%}
 
 
-{%- macro redshift__measure_avg(column_name, data_type) -%}
-
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    avg({{ adapter.quote(column_name) }}::float)
-{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
-    avg(case when {{ adapter.quote(column_name) }} then 1.0 else 0.0 end)
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-
-{%- endmacro -%}
-
-{%- macro sqlserver__measure_avg(column_name, data_type) -%}
-
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    avg(cast({{ adapter.quote(column_name) }} as float))
-{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
-    avg(cast(case when {{ adapter.quote(column_name) }} = 1 then 1.0 else 0.0 end as float))
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-
-{%- endmacro -%}
-
 {# measure_median  -------------------------------------------------     #}
 
 {%- macro measure_median(column_name, data_type, cte_name) -%}
@@ -190,65 +139,6 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- endmacro -%}
 
-{%- macro bigquery__measure_median(column_name, data_type, cte_name) -%}
-
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    APPROX_QUANTILES({{ adapter.quote(column_name) }}, 100)[OFFSET(50)]
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-
-{%- endmacro -%}
-
-{%- macro postgres__measure_median(column_name, data_type, cte_name) -%}
-
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    percentile_cont(0.5) within group (order by {{ adapter.quote(column_name) }})
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-
-{%- endmacro -%}
-
-{%- macro redshift__measure_median(column_name, data_type, cte_name) -%}
-
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    select percentile_cont(0.5) within group (order by {{ adapter.quote(column_name) }}) from {{ cte_name }}
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-
-{%- endmacro -%}
-
-{%- macro athena__measure_median(column_name, data_type, cte_name) -%}
-
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    approx_percentile( {{ adapter.quote(column_name) }}, 0.5)
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-
-{%- endmacro -%}
-
-{%- macro sqlserver__measure_median(column_name, data_type, cte_name) -%}
-
-{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    (
-        select avg(cast({{ adapter.quote(column_name) }} as float))
-        from (
-            select {{ adapter.quote(column_name) }},
-                   row_number() over (order by {{ adapter.quote(column_name) }}) as rn,
-                   count(*) over () as cnt
-            from {{ cte_name }}
-            where {{ adapter.quote(column_name) }} is not null
-        ) t
-        where rn in (floor((cnt + 1) / 2.0), ceiling((cnt + 1) / 2.0))
-    )
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-
-{%- endmacro -%}
 
 {# measure_std_dev_population  -------------------------------------------------     #}
 
@@ -267,18 +157,6 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- endmacro -%}
 
 
-{%- macro sqlserver__measure_std_dev_population(column_name, data_type) -%}
-
-{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
-    stdevp({{ adapter.quote(column_name) }})
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-
-{%- endmacro -%}
-
-
-
 {# measure_std_dev_sample  -------------------------------------------------     #}
 
 {%- macro measure_std_dev_sample(column_name, data_type) -%}
@@ -289,16 +167,6 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
     stddev_samp({{ adapter.quote(column_name) }})
-{%- else -%}
-    cast(null as {{ dbt.type_numeric() }})
-{%- endif -%}
-
-{%- endmacro -%}
-
-{%- macro sqlserver__measure_std_dev_sample(column_name, data_type) -%}
-
-{%- if dbt_profiler.is_numeric_dtype(data_type) -%}
-    stdev({{ adapter.quote(column_name) }})
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}

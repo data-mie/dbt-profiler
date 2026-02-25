@@ -26,9 +26,11 @@ Note: The GitHub repository is configured to **automatically delete head branche
 Pull requests will trigger a CircleCI pipeline with the following checks:
 
 - ✅ `integration-postgres` – runs automatically on all PRs.
+- ✅ `integration-sqlserver` – runs automatically on all PRs.
 - 🔒 `integration-bigquery` – requires **explicit approval from a maintainer** in the CircleCI UI before running (due to usage of limited credentials).
+- 🔒 `integration-snowflake` – requires **explicit approval from a maintainer** in the CircleCI UI before running (due to usage of limited credentials).
 
-Please ensure both checks pass before requesting a review or merging the PR.
+Please ensure all checks pass before requesting a review or merging the PR.
 
 ### 3. Pull Request Requirements
 
