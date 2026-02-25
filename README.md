@@ -4,7 +4,7 @@
 
 # dbt-profiler
 
-> dbt macros for profiling database relations and embedding the results in dbt docs and schema files.
+> Add data profiling to your dbt project. Get null rates, distinct counts, min/max and more for any model or source.
 
 ## Contents
 
