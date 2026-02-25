@@ -25,6 +25,18 @@ integration_tests:
       timeout_seconds: 300
       priority: interactive
       retries: 1
+    sqlserver:
+      type: sqlserver
+      driver: 'ODBC Driver 18 for SQL Server'
+      server: localhost
+      port: 1433
+      database: master
+      schema: dbt_profiler_integration_tests_sqlserver
+      username: sa
+      password: "Dbt_profiler_ci_1!"
+      authentication: sql
+      trust_cert: true
+      threads: 1
     snowflake:
       type: snowflake
       account: '{{ env_var("SNOWFLAKE_ACCOUNT") }}'

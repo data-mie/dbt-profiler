@@ -54,6 +54,45 @@ jobs:
           name: Run update-relation-profile.sh script
           command: ../update-relation-profile.sh $INTEGRATION_TEST_RELATION $INTEGRATION_TEST_SCHEMA
 
+  integration-sqlserver:
+    docker:
+      - image: cimg/python:3.11
+      - image: mcr.microsoft.com/mssql/server:2022-latest
+        environment:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: "Dbt_profiler_ci_1!"
+
+    resource_class: medium
+
+    environment:
+      DBT_PROFILES_DIR: ./
+
+    working_directory: ~/repo/integration_tests
+
+    steps:
+      - checkout:
+          path: ~/repo
+      - run:
+          name: Install ODBC driver
+          command: |
+            curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+            curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+            sudo apt-get update
+            sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+      - run:
+          name: Install dependencies
+          command: |
+            pip install "dbt-sqlserver>=1.1.0,<2.0.0"
+            dbt deps
+            dbt --version
+      - run:
+          name: Wait for SQL Server to be ready
+          command: sleep 30
+      - run:
+          name: Run tests
+          command: |
+            dbt build --target sqlserver
+
   integration-bigquery:
     docker:
       - image: cimg/python:3.11
@@ -125,6 +164,7 @@ workflows:
   continuous-integration:
     jobs:
       - integration-postgres
+      - integration-sqlserver
       - approve-bigquery:
           type: approval
       - integration-bigquery:

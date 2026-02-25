@@ -162,6 +162,18 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- endmacro -%}
 
+{%- macro sqlserver__measure_avg(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    avg(cast({{ adapter.quote(column_name) }} as float))
+{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
+    avg(cast(case when {{ adapter.quote(column_name) }} = 1 then 1.0 else 0.0 end as float))
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
 {# measure_median  -------------------------------------------------     #}
 
 {%- macro measure_median(column_name, data_type, cte_name) -%}
@@ -221,7 +233,17 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 {%- macro sqlserver__measure_median(column_name, data_type, cte_name) -%}
 
 {%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
-    percentile_cont({{ adapter.quote(column_name) }}, 0.5) over ()
+    (
+        select avg(cast({{ adapter.quote(column_name) }} as float))
+        from (
+            select {{ adapter.quote(column_name) }},
+                   row_number() over (order by {{ adapter.quote(column_name) }}) as rn,
+                   count(*) over () as cnt
+            from {{ cte_name }}
+            where {{ adapter.quote(column_name) }} is not null
+        ) t
+        where rn in (floor((cnt + 1) / 2.0), ceiling((cnt + 1) / 2.0))
+    )
 {%- else -%}
     cast(null as {{ dbt.type_numeric() }})
 {%- endif -%}

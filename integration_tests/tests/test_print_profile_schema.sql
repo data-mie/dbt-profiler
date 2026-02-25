@@ -1,3 +1,4 @@
+{% set _ = ref('test_data_default') %}
 {% if execute %}
 
   {% set schema_dict = dbt_profiler.print_profile_schema(relation_name="test_data_default") %}
@@ -6,18 +7,18 @@
   {% set actual_relation_name = schema_dict["models"][0]["name"] %}
   {% set actual_description = schema_dict["models"][0]["description"] %}
   {% set actual_column_count = schema_dict["models"][0]["columns"] | length %}
-  
-  {% set is_pass = 
-    schema_dict["version"] == 2 
-    and actual_model_count == 1 
-    and actual_relation_name == "test_data_default" 
+
+  {% set is_pass =
+    schema_dict["version"] == 2
+    and actual_model_count == 1
+    and actual_relation_name == "test_data_default"
     and actual_description == ""
     and actual_column_count == 7
   %}
   {% if not is_pass %}
-    select 'fail'
+    select 'fail' as result
   {% else %}
-    select 'ok' limit 0
+    select 'ok' as result from (select 1 as _dummy) _t where 1=0
   {% endif %}
-  
+
 {% endif %}

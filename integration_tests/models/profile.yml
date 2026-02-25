@@ -34,6 +34,12 @@ models:
           - accepted_values:
               quote: false
               values: ["TRUE", "FALSE"]
+              config:
+                enabled: "{{ target.type != 'sqlserver' }}"
+          - accepted_values:
+              values: [0, 1]
+              config:
+                enabled: "{{ target.type == 'sqlserver' }}"
 
       - name: avg
         tests:

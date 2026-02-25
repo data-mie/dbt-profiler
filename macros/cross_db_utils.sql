@@ -53,6 +53,11 @@
   {% do return(is_bool) %}
 {%- endmacro -%}
 
+{%- macro sqlserver__is_logical_dtype(dtype) -%}
+  {% set is_bool = dtype == "bit" %}
+  {% do return(is_bool) %}
+{%- endmacro -%}
+
 {# is_date_or_time_dtype  -------------------------------------------------     #}
 
 {%- macro is_date_or_time_dtype(dtype) -%}
