@@ -33,9 +33,7 @@ jobs:
       - run:
           name: Run tests
           command: |
-            dbt seed --target postgres
-            dbt run --target postgres
-            dbt test --target postgres
+            dbt build --target postgres
 
       - run:
           name: Run print_profile macro
@@ -87,9 +85,7 @@ jobs:
       - run:
           name: Run tests
           command: |
-            dbt seed --target bigquery
-            dbt run --target bigquery
-            dbt test --target bigquery
+            dbt build --target bigquery
 
   integration-snowflake:
     docker:
@@ -122,9 +118,7 @@ jobs:
       - run:
           name: Run tests
           command: |
-            dbt seed --target snowflake
-            dbt run --target snowflake
-            dbt test --target snowflake
+            dbt build --target snowflake
 
 workflows:
   version: 2
