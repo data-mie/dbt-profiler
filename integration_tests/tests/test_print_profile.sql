@@ -8,7 +8,7 @@
   {% if not is_pass %}
     select 'fail' as result
   {% else %}
-    select 'ok' as result where 1=0
+    select 'ok' as result from (select 1 as _dummy) _t where 1=0
   {% endif %}
   
 {% endif %}
