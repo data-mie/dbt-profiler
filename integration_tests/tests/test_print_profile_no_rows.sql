@@ -7,7 +7,7 @@
   {% if not is_pass %}
     select 'fail'
   {% else %}
-    select 'ok' limit 0
+    select 'ok' where 1=0
   {% endif %}
   
 {% endif %}

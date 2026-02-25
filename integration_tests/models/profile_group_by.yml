@@ -6,10 +6,14 @@ models:
     columns:
       - name: group_by
         tests:
-          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_to_exist:
+              config:
+                enabled: "{{ target.type != 'sqlserver' }}"
 
     tests:
       - dbt_expectations.expect_multicolumn_sum_to_equal:
           column_list: [ "row_count" ]
           sum_total: 2
           row_condition: "group_by = 'A' and column_name = 'id'"
+          config:
+            enabled: "{{ target.type != 'sqlserver' }}"

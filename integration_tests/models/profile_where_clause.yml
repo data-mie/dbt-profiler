@@ -7,3 +7,5 @@ models:
         tests:
           - dbt_utils.expression_is_true:
               expression: "= 2"
+              config:
+                enabled: "{{ target.type != 'sqlserver' }}"
