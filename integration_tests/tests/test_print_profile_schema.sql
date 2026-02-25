@@ -15,9 +15,9 @@
     and actual_column_count == 7
   %}
   {% if not is_pass %}
-    select 'fail'
+    select 'fail' as result
   {% else %}
-    select 'ok' where 1=0
+    select 'ok' as result where 1=0
   {% endif %}
   
 {% endif %}

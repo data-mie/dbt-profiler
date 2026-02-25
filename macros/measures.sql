@@ -162,6 +162,18 @@ case when count(distinct {{ adapter.quote(column_name) }}) = count(*) then 1 els
 
 {%- endmacro -%}
 
+{%- macro sqlserver__measure_avg(column_name, data_type) -%}
+
+{%- if dbt_profiler.is_numeric_dtype(data_type) and not dbt_profiler.is_struct_dtype(data_type) -%}
+    avg(cast({{ adapter.quote(column_name) }} as float))
+{%- elif dbt_profiler.is_logical_dtype(data_type) -%}
+    avg(cast(case when {{ adapter.quote(column_name) }} = 1 then 1.0 else 0.0 end as float))
+{%- else -%}
+    cast(null as {{ dbt.type_numeric() }})
+{%- endif -%}
+
+{%- endmacro -%}
+
 {# measure_median  -------------------------------------------------     #}
 
 {%- macro measure_median(column_name, data_type, cte_name) -%}
