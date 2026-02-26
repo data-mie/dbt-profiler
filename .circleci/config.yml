@@ -183,19 +183,19 @@ jobs:
           name: Install package dependencies
           command: |
             export PATH="$HOME/.local/bin:$PATH"
-            dbtf deps
-            dbtf --version
+            dbt deps
+            dbt --version
       - run:
           name: Test database connection
           command: |
             export PATH="$HOME/.local/bin:$PATH"
             echo "${SNOWFLAKE_PRIVATE_KEY}" > ${SNOWFLAKE_PRIVATE_KEY_PATH}
-            dbtf debug --target snowflake
+            dbt debug --target snowflake
       - run:
           name: Run tests
           command: |
             export PATH="$HOME/.local/bin:$PATH"
-            dbtf build --target snowflake
+            dbt build --target snowflake
 
 workflows:
   version: 2
