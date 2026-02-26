@@ -20,3 +20,4 @@ models:
   +materialized: table
 flags:
   require_generic_test_arguments_property: true
+  send_anonymous_usage_stats: false
