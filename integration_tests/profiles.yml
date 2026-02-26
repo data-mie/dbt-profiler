@@ -37,19 +37,6 @@ integration_tests:
       type: snowflake
       account: '{{ env_var("SNOWFLAKE_ACCOUNT") }}'
       user: '{{ env_var("SNOWFLAKE_USER") }}'
-      private_key_path: '{{ env_var("SNOWFLAKE_PRIVATE_KEY_PATH") }}'
-      role: '{{ env_var("SNOWFLAKE_ROLE") }}'
-      database: '{{ env_var("SNOWFLAKE_DATABASE") }}'
-      warehouse: '{{ env_var("SNOWFLAKE_WAREHOUSE") }}'
-      schema: dbt_profiler_integration_tests_snowflake
-      threads: 4
-    # dbt Fusion (ADBC) passes private_key_path as a string to the ADBC
-    # jwt_private_key option instead of reading the file first (preview bug).
-    # Pass the key content directly as private_key to work around this.
-    snowflake_fusion:
-      type: snowflake
-      account: '{{ env_var("SNOWFLAKE_ACCOUNT") }}'
-      user: '{{ env_var("SNOWFLAKE_USER") }}'
       private_key: '{{ env_var("SNOWFLAKE_PRIVATE_KEY") }}'
       role: '{{ env_var("SNOWFLAKE_ROLE") }}'
       database: '{{ env_var("SNOWFLAKE_DATABASE") }}'

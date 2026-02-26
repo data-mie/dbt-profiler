@@ -134,7 +134,6 @@ jobs:
 
     environment:
       DBT_PROFILES_DIR: ./
-      SNOWFLAKE_PRIVATE_KEY_PATH: ./snowflake-private-key.p8
 
     working_directory: ~/repo/integration_tests
 
@@ -149,9 +148,15 @@ jobs:
             dbt --version
 
       - run:
+          name: Prepare Snowflake private key
+          command: |
+            # The SNOWFLAKE_PRIVATE_KEY CI secret stores the PEM key with spaces
+            # instead of newlines. Reformat it to proper PEM before running dbt.
+            python3 -c "import os; key=os.environ['SNOWFLAKE_PRIVATE_KEY']; parts=key.split('-----'); b64=parts[2].strip().replace(' ', chr(10)); formatted='-----'+parts[1]+'-----'+chr(10)+b64+chr(10)+'-----'+parts[3]+'-----'; open(os.environ['BASH_ENV'], 'a').write('export SNOWFLAKE_PRIVATE_KEY='+chr(39)+formatted+chr(39)+chr(10))"
+
+      - run:
           name: Test database connection
           command: |
-            echo "${SNOWFLAKE_PRIVATE_KEY}" > ${SNOWFLAKE_PRIVATE_KEY_PATH}
             dbt debug --target snowflake
 
       - run:
@@ -167,7 +172,6 @@ jobs:
 
     environment:
       DBT_PROFILES_DIR: ./
-      SNOWFLAKE_PRIVATE_KEY_PATH: ./snowflake-private-key.p8
       SHELL: /bin/bash
       # dbt Fusion evaluates all env_var() calls in profiles.yml on load,
       # not just the active target. Set dummy values for unused profiles.
@@ -200,12 +204,12 @@ jobs:
           name: Test database connection
           command: |
             export PATH="$HOME/.local/bin:$PATH"
-            dbt debug --target snowflake_fusion
+            dbt debug --target snowflake
       - run:
           name: Run tests
           command: |
             export PATH="$HOME/.local/bin:$PATH"
-            dbt build --target snowflake_fusion
+            dbt build --target snowflake
 
 workflows:
   version: 2
