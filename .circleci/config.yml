@@ -191,6 +191,20 @@ jobs:
             dbt deps
             dbt --version
       - run:
+          name: Prepare Snowflake private key
+          command: |
+            # The SNOWFLAKE_PRIVATE_KEY CI secret stores the PEM key with spaces
+            # instead of newlines. Reformat it to proper PEM before running dbt.
+            python3 -c "
+import os
+key = os.environ['SNOWFLAKE_PRIVATE_KEY']
+parts = key.split('-----')
+b64 = parts[2].strip().replace(' ', chr(10))
+formatted = '-----' + parts[1] + '-----' + chr(10) + b64 + chr(10) + '-----' + parts[3] + '-----'
+with open(os.environ['BASH_ENV'], 'a') as f:
+    f.write('export SNOWFLAKE_PRIVATE_KEY=' + chr(39) + formatted + chr(39) + chr(10))
+"
+      - run:
           name: Test database connection
           command: |
             export PATH="$HOME/.local/bin:$PATH"
