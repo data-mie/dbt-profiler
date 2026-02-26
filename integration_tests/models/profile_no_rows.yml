@@ -11,10 +11,11 @@ models:
       - name: row_count
         tests:
           - dbt_utils.expression_is_true:
-              expression: "= 0"
               config:
                 enabled: "{{ target.type != 'sqlserver' }}"
 
+              arguments:
+                expression: "= 0"
       - name: not_null_proportion
         tests:
           - dbt_expectations.expect_column_values_to_be_null:
@@ -30,10 +31,11 @@ models:
       - name: distinct_count
         tests:
           - dbt_utils.expression_is_true:
-              expression: "= 0"
               config:
                 enabled: "{{ target.type != 'sqlserver' }}"
 
+              arguments:
+                expression: "= 0"
       - name: is_unique
         tests:
           - dbt_expectations.expect_column_values_to_be_null:

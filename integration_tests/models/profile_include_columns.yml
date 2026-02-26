@@ -6,4 +6,5 @@ models:
       - name: column_name
         tests:
           - accepted_values:
-              values: ["numeric_not_nullable"]
+              arguments:
+                values: ["numeric_not_nullable"]

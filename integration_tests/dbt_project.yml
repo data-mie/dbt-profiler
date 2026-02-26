@@ -9,14 +9,14 @@ analysis-paths: ["analysis"]
 test-paths: ["tests"]
 seed-paths: ["data"]
 macro-paths: ["macros"]
-
-target-path: "target"
 clean-targets:
-    - "target"
-    - "dbt_modules"
+  - "target"
+  - "dbt_modules"
 
 seeds:
   +quote_columns: false
 
 models:
   +materialized: table
+flags:
+  require_generic_test_arguments_property: true
