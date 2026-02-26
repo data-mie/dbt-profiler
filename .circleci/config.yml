@@ -169,6 +169,11 @@ jobs:
       DBT_PROFILES_DIR: ./
       SNOWFLAKE_PRIVATE_KEY_PATH: ./snowflake-private-key.p8
       SHELL: /bin/bash
+      # dbt Fusion evaluates all env_var() calls in profiles.yml on load,
+      # not just the active target. Set dummy values for unused profiles.
+      POSTGRES_HOST: unused
+      BIGQUERY_PROJECT: unused
+      BIGQUERY_KEYFILE: unused
 
     working_directory: ~/repo/integration_tests
 

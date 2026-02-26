@@ -29,7 +29,7 @@ Pull requests will trigger a CircleCI pipeline with the following checks:
 - ✅ `integration-sqlserver` – runs automatically on all PRs.
 - 🔒 `integration-bigquery` – requires **explicit approval from a maintainer** in the CircleCI UI before running (due to usage of limited credentials).
 - 🔒 `integration-snowflake` – requires **explicit approval from a maintainer** in the CircleCI UI before running (due to usage of limited credentials).
-- 🔒 `integration-snowflake-fusion` – runs the same tests as `integration-snowflake` but using [dbt Fusion](https://docs.getdbt.com/docs/fusion/about-fusion) (`dbtf`) instead of dbt Core, to verify compatibility with the new Rust-based engine. Requires **explicit approval from a maintainer**.
+- 🔒 `integration-snowflake-fusion` – runs the same tests as `integration-snowflake` but using [dbt Fusion](https://docs.getdbt.com/docs/fusion/about-fusion) instead of dbt Core, to verify compatibility with the new Rust-based engine. Requires **explicit approval from a maintainer**.
 
 Please ensure all checks pass before requesting a review or merging the PR.
 
