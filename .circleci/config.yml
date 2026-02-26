@@ -194,13 +194,12 @@ jobs:
           name: Test database connection
           command: |
             export PATH="$HOME/.local/bin:$PATH"
-            echo "${SNOWFLAKE_PRIVATE_KEY}" > ${SNOWFLAKE_PRIVATE_KEY_PATH}
-            dbt debug --target snowflake
+            dbt debug --target snowflake_fusion
       - run:
           name: Run tests
           command: |
             export PATH="$HOME/.local/bin:$PATH"
-            dbt build --target snowflake
+            dbt build --target snowflake_fusion
 
 workflows:
   version: 2
