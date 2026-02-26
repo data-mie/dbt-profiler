@@ -26,7 +26,7 @@
 
 ## Installation
 
-`dbt-profiler` requires dbt `>=1.8.0`. Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions.
+`dbt-profiler` requires dbt `>=1.10.0`. Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions.
 
 ## Supported adapters
 
