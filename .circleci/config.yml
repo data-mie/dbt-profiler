@@ -159,6 +159,41 @@ jobs:
           command: |
             dbt build --target snowflake
 
+  integration-snowflake-fusion:
+    docker:
+      - image: cimg/python:3.11
+
+    resource_class: small
+
+    environment:
+      DBT_PROFILES_DIR: ./
+      SNOWFLAKE_PRIVATE_KEY_PATH: ./snowflake-private-key.p8
+
+    working_directory: ~/repo/integration_tests
+
+    steps:
+      - checkout:
+          path: ~/repo
+      - run:
+          name: Install dbt Fusion
+          command: |
+            curl -fsSL https://public.cdn.getdbt.com/fs/install/install.sh | sh -s -- --update
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASH_ENV"
+      - run:
+          name: Install package dependencies
+          command: |
+            dbtf deps
+            dbtf --version
+      - run:
+          name: Test database connection
+          command: |
+            echo "${SNOWFLAKE_PRIVATE_KEY}" > ${SNOWFLAKE_PRIVATE_KEY_PATH}
+            dbtf debug --target snowflake
+      - run:
+          name: Run tests
+          command: |
+            dbtf build --target snowflake
+
 workflows:
   version: 2
   continuous-integration:
@@ -175,3 +210,8 @@ workflows:
       - integration-snowflake:
           requires:
             - approve-snowflake
+      - approve-snowflake-fusion:
+          type: approval
+      - integration-snowflake-fusion:
+          requires:
+            - approve-snowflake-fusion
