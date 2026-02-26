@@ -168,6 +168,7 @@ jobs:
     environment:
       DBT_PROFILES_DIR: ./
       SNOWFLAKE_PRIVATE_KEY_PATH: ./snowflake-private-key.p8
+      SHELL: /bin/bash
 
     working_directory: ~/repo/integration_tests
 
