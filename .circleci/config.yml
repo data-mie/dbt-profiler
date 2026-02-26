@@ -179,20 +179,22 @@ jobs:
           name: Install dbt Fusion
           command: |
             curl -fsSL https://public.cdn.getdbt.com/fs/install/install.sh | sh -s -- --update
-            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASH_ENV"
       - run:
           name: Install package dependencies
           command: |
+            export PATH="$HOME/.local/bin:$PATH"
             dbtf deps
             dbtf --version
       - run:
           name: Test database connection
           command: |
+            export PATH="$HOME/.local/bin:$PATH"
             echo "${SNOWFLAKE_PRIVATE_KEY}" > ${SNOWFLAKE_PRIVATE_KEY_PATH}
             dbtf debug --target snowflake
       - run:
           name: Run tests
           command: |
+            export PATH="$HOME/.local/bin:$PATH"
             dbtf build --target snowflake
 
 workflows:
