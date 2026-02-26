@@ -22,19 +22,20 @@ models:
       - name: std_dev_population
         tests:
           - not_null:
-              where: column_name = 'hash_key'
-
+              config:
+                where: column_name = 'hash_key'
       - name: std_dev_sample
         tests:
           - not_null:
-              where: column_name = 'hash_key'
-
+              config:
+                where: column_name = 'hash_key'
       - name: avg
         tests:
           - not_null:
-              where: column_name = 'hash_key'
-
+              config:
+                where: column_name = 'hash_key'
       - name: median
         tests:
           - not_null:
-              where: column_name = 'hash_key'
+              config:
+                where: column_name = 'hash_key'

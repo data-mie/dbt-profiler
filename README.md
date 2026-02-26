@@ -1,6 +1,7 @@
 [![CircleCI](https://circleci.com/gh/data-mie/dbt-profiler/tree/main.svg?style=svg)](https://circleci.com/gh/data-mie/dbt-profiler/tree/main)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![dbt Hub](https://img.shields.io/badge/dbt%20Hub-dbt__profiler-FF694B)](https://hub.getdbt.com/data-mie/dbt_profiler/latest/)
+[![dbt Fusion compatible](https://img.shields.io/badge/dbt%20Fusion-compatible-5C4EE5)](https://docs.getdbt.com/docs/fusion/about-fusion)
 
 # dbt-profiler
 
@@ -25,7 +26,7 @@
 
 ## Installation
 
-`dbt-profiler` requires dbt `>=1.1.0`. Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions.
+`dbt-profiler` requires dbt `>=1.10.0`. Check [dbt Hub](https://hub.getdbt.com/data-mie/dbt_profiler/latest/) for the latest installation instructions.
 
 ## Supported adapters
 

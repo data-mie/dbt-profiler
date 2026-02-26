@@ -12,8 +12,9 @@ models:
 
     tests:
       - dbt_expectations.expect_multicolumn_sum_to_equal:
-          column_list: [ "row_count" ]
-          sum_total: 2
-          row_condition: "group_by = 'A' and column_name = 'id'"
           config:
             enabled: "{{ target.type != 'sqlserver' }}"
+          arguments:
+            column_list: ["row_count"]
+            sum_total: 2
+            row_condition: "group_by = 'A' and column_name = 'id'"
